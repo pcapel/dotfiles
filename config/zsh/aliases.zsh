@@ -41,3 +41,17 @@ alias ppy="poetry  run python"
 
 # Tmux stuff
 alias tatt="tmux attach"
+alias news="tmux new -s"
+
+# random stuff
+
+# Add a new branch fresh off of main
+# Alternatively, a fresh branch off of some other branch
+function fresh-branch() {
+  echo "Creating a new branch for $1"
+  if [ -z "$2" ]; then
+    git checkout main && gpr && git checkout -b $1
+  else
+    git checkout $2 && gpr && git checkout -b $1
+  fi
+}
