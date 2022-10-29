@@ -25,7 +25,7 @@ HOME = Path(HOME)
 
 CONFIG_DIR = Path(ENV.get("XDG_CONFIG_HOME", join(HOME, ".config")))
 SYMLINK_BASE = "config"
-DOTFILES = ["gitignore", "zshrc", "p10k.zsh"]
+DOTFILES = ["gitignore", "gitconfig", "gitmessage", "zshrc", "p10k.zsh"]
 
 
 class FileUtils:
@@ -65,30 +65,39 @@ def build_dirs(_in: Path):
 
 def connect_the_dirs(_to: Path):
     src_links = FileUtils.r_dirfiles("config")
+    created = False
     for file in src_links:
         _root, *rest = file.parts
         destination = _to / Path(join(*rest))
+        if isfile(destination):
+            continue
         FileUtils.slink(abspath(file), destination)
+        created = True
         print(f"Linking: {file} -> {destination}")
+    if not created:
+        print("Looks like there was nothing that needed to be linked!")
 
 
 def connect_the_dots(home: Path):
+    created = False
     for file in DOTFILES:
         dot = f".{file}"
-        if isfile(dot):
-            print(
-                f"File for {dot} already exists! Do you want to do something about that?"
-            )
         destination = home / dot
+        if isfile(destination):
+            continue
         FileUtils.slink(abspath(file), destination)
+        print(f"Linking: {file} -> {destination}")
+        created = True
+    if not created:
+        print("Looks like there was nothing that need to be linked!")
 
 
 if __name__ == "__main__":
-    print(f"Creating directories in {CONFIG_DIR}")
+    print(f"\nAttempting to created directories in {CONFIG_DIR}")
     build_dirs(CONFIG_DIR)
 
-    print(f"Creating symlinks into {CONFIG_DIR}")
+    print(f"\nAttempting to symlink into {CONFIG_DIR}")
     connect_the_dirs(CONFIG_DIR)
 
-    print(f"Connecting dotfiles to {HOME}")
+    print(f"\nAttempting to symlink dotfiles into {HOME}")
     connect_the_dots(HOME)
