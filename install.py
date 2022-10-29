@@ -1,4 +1,4 @@
-from os import environ, mkdir, symlink, walk
+from os import environ, mkdir, symlink, walk, system
 from os.path import abspath, isdir, isfile, join
 from pathlib import Path
 import sys
@@ -26,6 +26,7 @@ HOME = Path(HOME)
 CONFIG_DIR = Path(ENV.get("XDG_CONFIG_HOME", join(HOME, ".config")))
 SYMLINK_BASE = "config"
 DOTFILES = ["gitignore", "gitconfig", "gitmessage", "zshrc", "p10k.zsh"]
+CARGO_INSTALLS = ["stylua", "airmux", "fastmod"]
 
 
 class FileUtils:
@@ -92,6 +93,11 @@ def connect_the_dots(home: Path):
         print("Looks like there was nothing that need to be linked!")
 
 
+def install_cargos():
+    for cargo in CARGO_INSTALLS:
+        system(f"cargo install {cargo}")
+
+
 if __name__ == "__main__":
     print(f"\nAttempting to created directories in {CONFIG_DIR}")
     build_dirs(CONFIG_DIR)
@@ -101,3 +107,6 @@ if __name__ == "__main__":
 
     print(f"\nAttempting to symlink dotfiles into {HOME}")
     connect_the_dots(HOME)
+
+    print(f"\nAttempting to install cargos")
+    install_cargos()
