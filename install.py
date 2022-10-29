@@ -25,7 +25,7 @@ HOME = Path(HOME)
 
 CONFIG_DIR = Path(ENV.get("XDG_CONFIG_HOME", join(HOME, ".config")))
 SYMLINK_BASE = "config"
-DOTFILES = ["zshrc", "p10k.zsh"]
+DOTFILES = ["gitignore", "zshrc", "p10k.zsh"]
 
 
 class FileUtils:
@@ -77,7 +77,7 @@ def connect_the_dots(home: Path):
         dot = f".{file}"
         if isfile(dot):
             print(
-                "File for {dot} already exists! Do you want to do something about that?"
+                f"File for {dot} already exists! Do you want to do something about that?"
             )
         destination = home / dot
         FileUtils.slink(abspath(file), destination)
