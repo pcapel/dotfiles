@@ -15,10 +15,13 @@ import sys
 ###################################################################################################################################################################################################
 
 ENV = environ
-HOME = Path(ENV.get("HOME"))
+HOME = ENV.get("HOME")
 if HOME is None:
     print("YOU HAVE NO HOME!")
     sys.exit(1)
+assert HOME is not None
+HOME = Path(HOME)
+
 
 CONFIG_DIR = Path(ENV.get("XDG_CONFIG_HOME", join(HOME, ".config")))
 SYMLINK_BASE = "config"

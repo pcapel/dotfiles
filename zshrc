@@ -14,7 +14,7 @@ export MY_VIMRC="$HOME/.config/nvim/init.lua"
 alias vim="nvim -u $MY_VIMRC"
 
 export EDITOR=nvim
-export ZSH="$HOME/.oh-my-zsh"
+export OMZSH="$HOME/.oh-my-zsh"
 export ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # set XDG paths
@@ -30,7 +30,7 @@ export GENE_SYNTHESIS_OUTPUT_DIR=/Users/Philip.Capel/tmp/gene_synth
 export GENE_SYNTHESIS_INPUT_DIR=/Users/Philip.Capel/tools/aws_lambda/containers/gene_synthesis/test/files
 
 # https://stackoverflow.com/questions/62931101/i-have-multiple-files-of-zcompdump-why-do-i-have-multiple-files-of-these
-export ZSH_COMPDUMP=$ZSH/cache/.zcompdump-$HOST
+export ZSH_COMPDUMP=$OMZSH/cache/.zcompdump-$HOST
 
 # default apps
 (( ${+PAGER}   )) || export PAGER='less'
@@ -47,7 +47,7 @@ export PATH="/Users/Philip.Capel/.local/bin:$PATH"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
 
-source $ZSH/oh-my-zsh.sh
+source $OMZSH/oh-my-zsh.sh
 source $XDG_CONFIG_HOME/zsh/aliases.zsh
 
 
