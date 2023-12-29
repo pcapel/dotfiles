@@ -46,9 +46,6 @@ brew 'pspg'
 # for neovim
 brew 'lua'
 
-# ls replacement with icons and colors (rust)
-brew 'exa'
-
 # quickly jump to recently used folders
 brew 'autojump'
 
