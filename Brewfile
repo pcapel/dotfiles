@@ -144,4 +144,9 @@ brew 'tesseract'
 # required by ccls
 brew 'llvm'
 
+# tmux session manager
 brew 'tmuxp'
+
+# fonts
+tap 'homebrew/cask-fonts'
+brew 'font-hack-nerd-font'
