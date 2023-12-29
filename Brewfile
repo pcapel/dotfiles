@@ -116,7 +116,7 @@ brew 'neofetch'
 # best code editor on planet earth
 brew 'neovim'
 
-# OpenSSL - imporant for compiling things that support ssl
+# OpenSSL - important for compiling things that support ssl
 brew 'openssl@1.1'
 
 # better, faster grep
@@ -143,3 +143,5 @@ brew 'tesseract'
 
 # required by ccls
 brew 'llvm'
+
+brew 'tmuxp'

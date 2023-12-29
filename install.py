@@ -26,7 +26,7 @@ HOME = Path(HOME)
 CONFIG_DIR = Path(ENV.get("XDG_CONFIG_HOME", join(HOME, ".config")))
 SYMLINK_BASE = "config"
 DOTFILES = ["gitignore", "gitconfig", "gitmessage", "zshrc", "p10k.zsh"]
-CARGO_INSTALLS = ["stylua", "airmux", "fastmod"]
+CARGO_INSTALLS = ["stylua", "fastmod"]
 
 
 class FileUtils:
