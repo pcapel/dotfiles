@@ -1,12 +1,10 @@
 local utils = require 'core.utils'
 
-local elixir_present, elixir = pcall(require, 'elixir.language_server')
 local lspconfig_present, lspconfig = pcall(require, 'lspconfig')
 local mason_lspconfig_present, mason_lspconfig = pcall(require, 'mason-lspconfig')
 local mason_present, mason = pcall(require, 'mason')
 
 local deps = {
-  elixir_present,
   mason_present,
   mason_lspconfig_present,
   lspconfig_present,
@@ -21,11 +19,155 @@ local M = {}
 
 -- Sets up Mason and Mason LSP Config
 M.setup = function()
+  local root_pattern = lspconfig.util.root_pattern
+
+  local package_list = {
+    -- Null LS
+    'actionlint',
+    'codespell',
+    'eslint_d',
+    'prettierd',
+    'rubocop',
+    'shellcheck',
+    'shfmt',
+    'stylua',
+    'yamllint',
+
+    -- LSPs
+    -- NOTE: you do not need to add `elixir-ls` here.. it is now handled by
+    -- the elixir plugin. This is because Mason does not support downloading
+    -- and building LSPs using the project runtime. For more info see:
+    -- https://github.com/elixir-lsp/elixir-ls/issues/193
+    -- https://dragoshmocrii.com/fix-vscode-elixirls-intellisense-for-code-imported-with-use/
+    'ansible-language-server',
+    'arduino-language-server',
+    'bash-language-server',
+    'clangd',
+    'clang-format',
+    'cmake-language-server',
+    'css-lsp',
+    'dockerfile-language-server',
+    'elm-language-server',
+    'erlang-ls',
+    'eslint-lsp',
+    'gopls',
+    'go-debug-adapter',
+    'goimports',
+    'golangci-lint',
+    'golangci-lint-langserver',
+    'gomodifytags',
+    'helm-ls',
+    'html-lsp',
+    'json-lsp',
+    'lua-language-server',
+    'prosemd-lsp',
+    'rust-analyzer',
+    'solargraph', 'sqlls',
+    'tailwindcss-language-server',
+    'taplo',
+    'terraform-ls',
+    'typescript-language-server',
+    'vim-language-server',
+    'yaml-language-server',
+    'zls',
+  }
+
+  ---@diagnostic disable-next-line: redundant-parameter
   mason.setup {}
+
+  local mr = require 'mason-registry'
+  local function ensure_installed()
+    for _, tool in ipairs(package_list) do
+      local p = mr.get_package(tool)
+      if not p:is_installed() then
+        p:install()
+      end
+    end
+  end
+
+  if mr.refresh then
+    mr.refresh(ensure_installed)
+  else
+    ensure_installed()
+  end
+
   mason_lspconfig.setup {}
   mason_lspconfig.setup_handlers {
     function(server_name)
       lspconfig[server_name].setup {}
+    end,
+
+    ['tailwindcss'] = function()
+      lspconfig.tailwindcss.setup {
+        root_dir = root_pattern(
+          'assets/tailwind.config.js',
+          'tailwind.config.js',
+          'tailwind.config.ts',
+          'postcss.config.js',
+          'postcss.config.ts',
+          'package.json',
+          'node_modules'
+        ),
+        init_options = {
+          userLanguages = {
+            elixir = 'phoenix-heex',
+            eruby = 'erb',
+            heex = 'phoenix-heex',
+            svelte = 'html',
+          },
+        },
+        handlers = {
+          ['tailwindcss/getConfiguration'] = function(_, _, params, _, bufnr, _)
+            vim.lsp.buf_notify(bufnr, 'tailwindcss/getConfigurationResponse', { _id = params._id })
+          end,
+        },
+        settings = {
+          includeLanguages = {
+            typescript = 'javascript',
+            typescriptreact = 'javascript',
+            ['html-eex'] = 'html',
+            ['phoenix-heex'] = 'html',
+            heex = 'html',
+            eelixir = 'html',
+            elm = 'html',
+            erb = 'html',
+            svelte = 'html',
+          },
+          tailwindCSS = {
+            lint = {
+              cssConflict = 'warning',
+              invalidApply = 'error',
+              invalidConfigPath = 'error',
+              invalidScreen = 'error',
+              invalidTailwindDirective = 'error',
+              invalidVariant = 'error',
+              recommendedVariantOrder = 'warning',
+            },
+            experimental = {
+              classRegex = {
+                [[class= "([^"]*)]],
+                [[class: "([^"]*)]],
+                '~H""".*class="([^"]*)".*"""',
+              },
+            },
+            validate = true,
+          },
+        },
+        filetypes = {
+          'css',
+          'scss',
+          'sass',
+          'html',
+          'heex',
+          'elixir',
+          'eruby',
+          'javascript',
+          'javascriptreact',
+          'typescript',
+          'typescriptreact',
+          'svelte',
+        },
+      }
     end,
 
     -- JSON
@@ -41,13 +183,13 @@ M.setup = function()
     end,
 
     -- Lua
-    ['sumneko_lua'] = function()
+    ['lua_ls'] = function()
       -- Make runtime files discoverable to the lua server
       local runtime_path = vim.split(package.path, ';')
       table.insert(runtime_path, 'lua/?.lua')
       table.insert(runtime_path, 'lua/?/init.lua')
 
-      lspconfig.sumneko_lua.setup {
+      lspconfig.lua_ls.setup {
         settings = {
           Lua = {
             runtime = {
@@ -64,6 +206,8 @@ M.setup = function()
             workspace = {
               -- Make the server aware of Neovim runtime files
               library = vim.api.nvim_get_runtime_file('', true),
+              -- Stop prompting about 'luassert'. See https://github.com/neovim/nvim-lspconfig/issues/1700
+              checkThirdParty = false,
             },
             -- Do not send telemetry data containing a randomized but unique identifier
             telemetry = {
@@ -71,14 +215,6 @@ M.setup = function()
             },
           },
         },
-      }
-    end,
-
-    -- Elixir
-    ['elixirls'] = function()
-      lspconfig.elixirls.setup {
-        settings = elixir.settings {},
-        on_attach = elixir.on_attach,
       }
     end,
   }

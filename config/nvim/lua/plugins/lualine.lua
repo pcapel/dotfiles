@@ -4,10 +4,17 @@ if not present then
   return
 end
 
+local stl_escape = function(str)
+  if type(str) ~= 'string' then
+    return str
+  end
+  return str:gsub('%%', '%%%%')
+end
+
 local M = {}
 
 M.setup = function()
-  local tokyonight_colors = require('tokyonight.colors').setup { style = 'storm' }
+  local tokyonight_colors = require('tokyonight.colors').setup { style = 'moon' }
 
   ---@diagnostic disable:undefined-field
   local colors = {
@@ -35,9 +42,11 @@ M.setup = function()
   local function process_sections(sections)
     for name, section in pairs(sections) do
       local left = name:sub(9, 10) < 'x'
+
       for pos = 1, name ~= 'lualine_z' and #section or #section - 1 do
         table.insert(section, pos * 2, { empty, color = { fg = colors.white, bg = colors.white } })
       end
+
       for id, comp in ipairs(section) do
         if type(comp) ~= 'table' then
           comp = { comp }
@@ -46,6 +55,7 @@ M.setup = function()
         comp.separator = left and { right = '' } or { left = '' }
       end
     end
+
     return sections
   end
 
@@ -53,12 +63,16 @@ M.setup = function()
     if vim.v.hlsearch == 0 then
       return ''
     end
+
     local last_search = vim.fn.getreg '/'
+
     if not last_search or last_search == '' then
       return ''
     end
+
     local searchcount = vim.fn.searchcount { maxcount = 9999 }
-    return last_search .. '(' .. searchcount.current .. '/' .. searchcount.total .. ')'
+
+    return stl_escape(last_search) .. '(' .. searchcount.current .. '/' .. searchcount.total .. ')'
   end
 
   local function modified()
@@ -70,7 +84,49 @@ M.setup = function()
     return ''
   end
 
+  local function location()
+    local line = vim.fn.line '.'
+    local col = vim.fn.virtcol '.'
+    return string.format(' %d,  %d', line, col)
+  end
+
+  local function is_recording()
+    local name = vim.api.nvim_call_function('reg_recording', {})
+    return name ~= ''
+  end
+
+  local function get_recording_name()
+    return '⏺️ Rec @' .. vim.api.nvim_call_function('reg_recording', {})
+  end
+
+  ---@diagnostic disable-next-line: redundant-parameter
   lualine.setup {
+    winbar = {
+      lualine_a = {
+        {
+          'filetype',
+          colored = true, -- Displays filetype icon in color if set to true
+          icon_only = true, -- Display only an icon for filetype
+          icon = { align = 'right' }, -- Display filetype icon on the right hand side
+          color = { bg = colors.grey, fg = colors.black },
+          -- icon =    {'X', align='right'}
+          -- Icon string ^ in table is ignored in filetype component
+        },
+        { 'filename', separator = { right = '' }, color = { bg = colors.grey, fg = colors.black } },
+      },
+      lualine_b = {},
+      lualine_c = {},
+      lualine_x = {
+        -- show available updates
+        {
+          require('lazy.status').updates,
+          cond = require('lazy.status').has_updates,
+          color = { fg = '#ff9e64' },
+        },
+      },
+      lualine_y = {},
+      lualine_z = {},
+    },
     options = {
       -- theme = theme,
       component_separators = '',
@@ -122,9 +178,15 @@ M.setup = function()
         },
       },
       lualine_c = {},
-      lualine_x = {},
+      lualine_x = {
+        {
+          get_recording_name,
+          cond = is_recording,
+          color = { fg = '#ff9e64' },
+        },
+      },
       lualine_y = { search_result, 'filetype' },
-      lualine_z = { '%l:%c', '%p%%/%L' },
+      lualine_z = { location, '%p%%/%L' },
     },
     inactive_sections = {
       lualine_c = { '%f %y %m' },

@@ -30,9 +30,9 @@ alias phs='mix phx.server'
 alias k="kubectl"
 
 # Exa - https://the.exa.website/
-alias l="exa --group --header --classify --icons --group-directories-first"
-alias ls="exa --group --all --header --classify --icons --group-directories-first"
-alias ll="exa --long --header --git --all --group --icons --group-directories-first"
+# alias l="exa --group --header --classify --icons --group-directories-first"
+# alias ls="exa --group --all --header --classify --icons --group-directories-first"
+# alias ll="exa --long --header --git --all --group --icons --group-directories-first"
 
 # Common operations when not inside of a poetry shell
 alias pr="poetry run"

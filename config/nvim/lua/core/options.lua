@@ -51,7 +51,7 @@ opt.splitright = true
 
 -- should make scrolling faster
 opt.ttyfast = true
-opt.lazyredraw = true
+opt.lazyredraw = false
 
 opt.backspace = 'indent,eol,start' -- Backspace deletes like most programs in insert mode
 opt.history = 200 -- how many : commands to save in history

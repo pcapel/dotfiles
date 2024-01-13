@@ -45,11 +45,6 @@ end
 local silent = { silent = true }
 local default_opts = { noremap = true, silent = true }
 
--- TODO: find out why this doesn't work with helper funcs or why I can't just
--- set the leader to space directly
--- alias for leader key (use space as leader)
--- vim.g.mapleader = ' '
--- vim.g.maplocalleader = ' '
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", silent)
 -- set leader key to `\` so that I can alias it to <space>
 vim.g.mapleader = "\\"
@@ -400,25 +395,19 @@ M.undotree_mappings = function()
 	nmap({ "<leader>ut", "<cmd>UndotreeToggle<CR>" })
 end
 
-M.packer_mappings = function()
-	nmap({ "<leader>pl", "<cmd>PackerCompile<CR>" })
-	nmap({ "<leader>ps", "<cmd>PackerSync<CR>" })
-	nmap({ "<leader>pc", "<cmd>PackerClean<CR>" })
-end
-
-M.attempt_mappings = function(attempt)
-	-- new attempt, selecting extension
-	nmap({ "<leader>sn", attempt.new_select, default_opts })
-	-- run current attempt buffer
-	nmap({ "<leader>sr", attempt.run, default_opts })
-	-- delete attempt from current buffer
-	nmap({ "<leader>sd", attempt.delete_buf, default_opts })
-	-- rename attempt from current buffer
-	nmap({ "<leader>sc", attempt.rename_buf, default_opts })
-	-- open one of the existing scratch buffers
-	nmap({ "<leader>sl", attempt.open_select, default_opts })
-end
-
+--M.attempt_mappings = function(attempt)
+-- new attempt, selecting extension
+--nmap({ "<leader>sn", attempt.new_select, default_opts })
+-- run current attempt buffer
+--nmap({ "<leader>sr", attempt.run, default_opts })
+-- delete attempt from current buffer
+--nmap({ "<leader>sd", attempt.delete_buf, default_opts })
+-- rename attempt from current buffer
+--nmap({ "<leader>sc", attempt.rename_buf, default_opts })
+-- open one of the existing scratch buffers
+--nmap({ "<leader>sl", attempt.open_select, default_opts })
+--end
+--
 M.gitsigns_mappings = function(gitsigns, bufnr)
 	local opts = { expr = true, buffer = bufnr }
 
@@ -459,6 +448,9 @@ M.gitsigns_mappings = function(gitsigns, bufnr)
 
 	-- Text object for git hunks (e.g. vih will select the hunk)
 	map({ { "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>" })
+end
+
+M.notify_mappings = function(gitsigns, bufnr)
 end
 
 return M
