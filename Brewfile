@@ -46,9 +46,6 @@ brew 'pspg'
 # for neovim
 brew 'lua'
 
-# ls replacement with icons and colors (rust)
-brew 'exa'
-
 # quickly jump to recently used folders
 brew 'autojump'
 
@@ -116,7 +113,7 @@ brew 'neofetch'
 # best code editor on planet earth
 brew 'neovim'
 
-# OpenSSL - imporant for compiling things that support ssl
+# OpenSSL - important for compiling things that support ssl
 brew 'openssl@1.1'
 
 # better, faster grep
@@ -143,3 +140,10 @@ brew 'tesseract'
 
 # required by ccls
 brew 'llvm'
+
+# tmux session manager
+brew 'tmuxp'
+
+# fonts
+tap 'homebrew/cask-fonts'
+brew 'font-hack-nerd-font'

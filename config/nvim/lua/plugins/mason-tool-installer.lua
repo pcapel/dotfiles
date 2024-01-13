@@ -26,6 +26,11 @@ M.setup = function()
 			"mypy",
 
 			-- LSPs
+			-- NOTE: you do not need to add `elixir-ls` here.. it is now handled by
+			-- the elixir plugin. This is because Mason does not support downloading
+			-- and building LSPs using the project runtime. For more info see:
+			-- https://github.com/elixir-lsp/elixir-ls/issues/193
+			-- https://dragoshmocrii.com/fix-vscode-elixirls-intellisense-for-code-imported-with-use/
 
 			"ansible-language-server",
 			"arduino-language-server",
@@ -34,7 +39,6 @@ M.setup = function()
 			"cmake-language-server",
 			"css-lsp",
 			"dockerfile-language-server",
-			"elixir-ls",
 			"elm-language-server",
 			-- "erlang-ls",
 			"eslint-lsp",

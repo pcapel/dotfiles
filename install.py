@@ -3,17 +3,6 @@ from os.path import abspath, isdir, isfile, join
 from pathlib import Path
 import sys
 
-# TODO: In order to install the fonts, I will need requests
-# TODO: In order to get requests, I should have poetry
-# TODO: In order to get poetry, I should use a shell or brew
-# TODO: I need to move over a brew script...
-# FONT_URLS = ['https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/CascadiaCode/Regular/complete/Caskaydia%20Cove%20Nerd%20Font%20Complete%20Mono%20Regular.otf',
-#      'https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/CascadiaCode/Regular/complete/Caskaydia%20Cove%20Nerd%20Font%20Complete%20Mono%20Italic.otf',
-#      'https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/CascadiaCode/Bold/complete/Caskaydia%20Cove%20Nerd%20Font%20Complete%20Mono%20Bold.otf',
-#      ]
-# FONTS_DIR = f'{HOME}/Library/Fonts'
-###################################################################################################################################################################################################
-
 ENV = environ
 HOME = ENV.get("HOME")
 if HOME is None:
@@ -26,7 +15,7 @@ HOME = Path(HOME)
 CONFIG_DIR = Path(ENV.get("XDG_CONFIG_HOME", join(HOME, ".config")))
 SYMLINK_BASE = "config"
 DOTFILES = ["gitignore", "gitconfig", "gitmessage", "zshrc", "p10k.zsh"]
-CARGO_INSTALLS = ["stylua", "airmux", "fastmod"]
+CARGO_INSTALLS = ["stylua", "fastmod"]
 
 
 class FileUtils:

@@ -1,12 +1,11 @@
 ---
-name: dotfiles # of the session
-root: ~/open_source/dotfiles # of the session
+session_name: dotfiles
+root: ~/open_source/dotfiles
 clear_panes: true
 
 windows:
-  - editor:
-      layout: main-vertical # any valid tmux layout is accepted
-      # Short form for panes, with a single command each:
-      panes:
-        -
-        - vim
+  - window_name: dotfiles
+    layout: main-vertical
+    panes:
+      -
+      - vim

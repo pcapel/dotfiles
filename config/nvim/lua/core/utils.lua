@@ -13,6 +13,27 @@ function M.load_local_vimrc()
   end
 end
 
+M.icons = {
+  dap = {
+    Stopped = { '󰁕 ', 'DiagnosticWarn', 'DapStoppedLine' },
+    Breakpoint = ' ',
+    BreakpointCondition = ' ',
+    BreakpointRejected = { ' ', 'DiagnosticError' },
+    LogPoint = '.>',
+  },
+  diagnostics = {
+    Error = ' ',
+    Warn = ' ',
+    Hint = ' ',
+    Info = ' ',
+  },
+  git = {
+    added = ' ',
+    modified = ' ',
+    removed = ' ',
+  },
+}
+
 -- Returns a list of border characters
 ---@param name 'double' | 'none' | 'rounded' | 'shadow' | 'single'
 ---@return table<string>
@@ -75,7 +96,7 @@ function M.read_json_schemas()
 
   if catalog_path:exists() then
     local contents = catalog_path:read()
-    return vim.json.decode(contents)
+    return vim.json.decode(contents --[[@as string]])
   else
     return nil
   end
@@ -136,9 +157,20 @@ function M.fold(callback, list, accum)
   return accum
 end
 
+-- this needs to be called something other than Autocmd to avoid conflict with
+-- the built-in type
+---@class MyAutocmd
+---@field desc string
+---@field event  string[] list of autocommand events
+---@field pattern string[] list of autocommand patterns
+---@field command string | function
+---@field nested  boolean
+---@field once    boolean
+---@field buffer  number
+
 --- Validate the keys passed to as.augroup are valid
 ---@param name string
----@param cmd Autocommand
+---@param cmd MyAutocmd
 local function validate_autocmd(name, cmd)
   local keys = { 'event', 'buffer', 'pattern', 'desc', 'command', 'group', 'once', 'nested' }
   local incorrect = M.fold(function(accum, _, key)
@@ -151,26 +183,16 @@ local function validate_autocmd(name, cmd)
     return
   end
   vim.schedule(function()
-    ---@diagnostic disable-next-line: redundant-parameter
-    vim.notify('Incorrect keys: ' .. table.concat(incorrect, ', '), 'error', {
+    vim.notify('Incorrect keys: ' .. table.concat(incorrect, ', '), vim.log.levels.ERROR, {
       title = fmt('Autocmd: %s', name),
     })
   end)
 end
 
----@class Autocommand
----@field desc string
----@field event  string[] list of autocommand events
----@field pattern string[] list of autocommand patterns
----@field command string | function
----@field nested  boolean
----@field once    boolean
----@field buffer  number
-
----Create an autocommand
----returns the group ID so that it can be cleared or manipulated.
+--- Create an autocommand
+--- returns the group ID so that it can be cleared or manipulated.
 ---@param name string
----@param commands Autocommand[]
+---@param commands MyAutocmd[]
 ---@return number
 function M.augroup(name, commands)
   assert(name ~= 'User', 'The name of an augroup CANNOT be User')
@@ -180,12 +202,15 @@ function M.augroup(name, commands)
   for _, autocmd in ipairs(commands) do
     validate_autocmd(name, autocmd)
     local is_callback = type(autocmd.command) == 'function'
+    local callback = is_callback and autocmd.command or nil
+    local command = not is_callback and autocmd.command or nil
+
     vim.api.nvim_create_autocmd(autocmd.event, {
       group = id,
       pattern = autocmd.pattern,
       desc = autocmd.desc,
-      callback = is_callback and autocmd.command or nil,
-      command = not is_callback and autocmd.command or nil,
+      callback = callback,
+      command = command --[[@as string]],
       once = autocmd.once,
       nested = autocmd.nested,
       buffer = autocmd.buffer,

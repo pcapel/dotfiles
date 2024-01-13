@@ -10,6 +10,10 @@ Please don't even begin to base anything off of my work.
 
 ## TODO
 
-It would be cool to have something to fix the way that certain tools modify your
-zshrc by copying it to .zshrc.before-tool-installation (like oh-my-zsh and nix).
-Something like "dots" would be an excellent base command space...
+- How do I test tings?
+- Is there a way to set up sessions easily? Like, I want to just call `foo`
+  where `foo` is some predefined session and have it load.
+- I want to be able to deal with environments in a clean way. It'd be super cool
+  to have a set of files that I could have sourced automatically when setting up
+  tmux sessions. This could be related to the above `foo` call, where whatever I
+  do there looks for an env file? Hmmm...

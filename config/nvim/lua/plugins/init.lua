@@ -1,36 +1,14 @@
-local present, packer = pcall(require, "plugins.packer_init")
+local core_mappings = require("core.mappings")
 
-if not present then
-	print("Packer init not found!")
-	return false
-end
-
-return packer.startup(function(use)
-	-- Packer can manage itself
-	use({
-		"wbthomason/packer.nvim",
-		config = function()
-			require("core.mappings").packer_mappings()
-		end,
-	})
-
-	use({
-		"ggandor/leap.nvim",
-		config = function()
-			require("leap").add_default_mappings()
-		end,
-	})
-
-	-- Speed up loading Lua modules in Neovim to improve startup time.
-	use({ "lewis6991/impatient.nvim" })
-
-	use({
+require("lazy").setup({
+	{
 		"hrsh7th/nvim-cmp",
-		requires = {
+		event = "InsertEnter",
+		dependencies = {
 			-- snippet engine, required by cmp
 			{
 				"L3MON4D3/LuaSnip",
-				requires = {
+				dependencies = {
 					-- snippets!
 					"rafamadriz/friendly-snippets",
 				},
@@ -45,24 +23,27 @@ return packer.startup(function(use)
 			"hrsh7th/cmp-cmdline",
 			-- neovim lua config api completion
 			"hrsh7th/cmp-nvim-lua",
-			-- emoji completion (triggered by `:`)
-			"hrsh7th/cmp-emoji",
 			-- snippets in completion sources
 			"saadparwaiz1/cmp_luasnip",
 			-- git completions
 			"petertriho/cmp-git",
 			-- tmux pane completion
 			"andersevenrud/cmp-tmux",
+			-- icons for the completion menu
+			"onsails/lspkind.nvim",
+			"nvim-lua/plenary.nvim",
 		},
 		config = function()
 			require("plugins.cmp").setup()
 		end,
-	})
+	},
 
-	-- installs/updates LSPs, linters and DAPs
-	use({
+	-- -- installs/updates LSPs, linters and DAPs
+	{
 		"williamboman/mason.nvim",
-		requires = {
+		build = ":MasonUpdate",
+		event = "VeryLazy",
+		dependencies = {
 			-- handles connection of LSP Configs and Mason
 			"williamboman/mason-lspconfig.nvim",
 
@@ -71,362 +52,416 @@ return packer.startup(function(use)
 
 			-- required for setting up capabilities for cmp
 			"hrsh7th/cmp-nvim-lsp",
-
-			-- elixir commands from elixirls
-			{
-				"mhanberg/elixir.nvim",
-				requires = { "neovim/nvim-lspconfig", "nvim-lua/plenary.nvim" },
-			},
-
-			{
-				"SmiteshP/nvim-navic",
-				requires = "neovim/nvim-lspconfig",
-			},
 		},
 		config = function()
 			require("plugins.lsp").setup()
 		end,
-	})
+	},
 
-	-- LSP UI utils
-	use({
-		"glepnir/lspsaga.nvim",
-		branch = "main",
+	-- elixir lsp support
+	{
+		"elixir-tools/elixir-tools.nvim",
+		version = "*",
+		event = { "BufReadPre", "BufNewFile" },
 		config = function()
-			require("plugins.lspsaga").setup()
-		end,
-	})
+			local elixir = require("elixir")
+			local elixirls = require("elixir.elixirls")
 
-	-- automatically install tools using mason
-	use({
-		"WhoIsSethDaniel/mason-tool-installer.nvim",
-		requires = {
-			"williamboman/mason.nvim",
-		},
-		config = function()
-			require("plugins.mason-tool-installer").setup()
+			elixir.setup({
+				nextls = { enable = false },
+				-- add explicit version to sidestep issues with the utils in elixir tools
+				-- not having the function correctly defined
+				credo = { enable = true, version = 1.7 },
+				elixirls = {
+					enable = true,
+					settings = elixirls.settings({
+						dialyzerEnabled = true,
+						enableTestLenses = false,
+					}),
+					on_attach = function(client, bufnr)
+						core_mappings.elixir_mappings()
+						require("plugins.lsp").on_attach(client, bufnr)
+					end,
+				},
+			})
 		end,
-	})
-
-	-- Use Neovim as a language server to inject LSP diagnostics, code
-	-- actions, and more via Lua.
-	use({
-		"jose-elias-alvarez/null-ls.nvim",
-		requires = {
+		dependencies = {
 			"nvim-lua/plenary.nvim",
+		},
+	},
 
+	-- Neovim as a language server to inject LSP diagnostics, code
+	-- actions, and more via Lua.
+	-- This is now using the community fork: https://github.com/nvimtools/none-ls.nvim
+	{
+		"nvimtools/none-ls.nvim",
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"williamboman/mason.nvim",
 			"lukas-reineke/lsp-format.nvim",
 		},
 		config = function()
 			require("plugins.null-ls").setup()
 		end,
-	})
+	},
 
-	-- makes mappings more discoverable using modals that show up after the prefix
-	-- was pressed
-	use({
-		"anuvyklack/hydra.nvim",
-		config = function()
-			require("plugins.hydra").setup()
+	-- Automatically highlights other instances of the word under your cursor.
+	-- This works with LSP, Treesitter, and regexp matching to find the other
+	-- instances.
+	{
+		"RRethy/vim-illuminate",
+		event = { "BufReadPost", "BufNewFile" },
+		opts = {
+			delay = 200,
+			large_file_cutoff = 2000,
+			large_file_overrides = {
+				providers = { "lsp" },
+			},
+		},
+
+		-- this is a good example of how to have both `opts` and `config`
+		config = function(_, opts)
+			require("illuminate").configure(opts)
 		end,
-	})
+	},
 
-	-- function signature help via LSP
-	-- TODO: figure out why this fails miserably
-	--[[ use({ ]]
-	--[[ 	"ray-x/lsp_signature.nvim", ]]
-	--[[ 	setup = function() ]]
-	--[[ 		print(require("lsp_signature")) ]]
-	--[[ 		require("lsp_signature").setup({ wrap = true }) ]]
-	--[[ 	end, ]]
-	--[[ }) ]]
-
-	--  pretty diagnostics, references, telescope results, quickfix and location list to help you solve all the trouble your code is causing.
-	use({
+	--  pretty diagnostics, references, telescope results, quickfix and location
+	--  list to help you solve all the trouble your code is causing.
+	{
 		"folke/trouble.nvim",
-		requires = "kyazdani42/nvim-web-devicons",
-		config = function()
-			require("plugins.trouble").setup()
-		end,
-	})
+		cmd = { "Trouble", "TroubleToggle" },
+		dependencies = "nvim-tree/nvim-web-devicons",
+		keys = core_mappings.trouble_mappings,
+		opts = {},
+	},
+	--
+	-- -- -- modern vim command line replacement, requires nvim 0.9 or higher
+	{
+		"folke/noice.nvim",
+		enabled = true,
+		event = "VeryLazy",
+		opts = {
+			lsp = {
+				-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+				override = {
+					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+					["vim.lsp.util.stylize_markdown"] = true,
+					["cmp.entry.get_documentation"] = true,
+				},
+			},
+			views = {
+				cmdline_popup = {
+					position = {
+						row = 1,
+						col = "50%",
+					},
+				},
+			},
+			presets = {
+				-- you can enable a preset by setting it to true, or a table that will override the preset config
+				-- you can also add custom presets that you can enable/disable with enabled=true
+				bottom_search = true, -- use a classic bottom cmdline for search
+				long_message_to_split = true, -- long messages will be sent to a split
+				lsp_doc_border = true, -- add a border to hover docs and signature help
+			},
+
+			routes = {
+				-- hide buffer written messages
+				{
+					view = "mini",
+					filter = {
+						event = "msg_show",
+						kind = "",
+						find = "written",
+					},
+					opts = {},
+				},
+				-- hide the annoying code_action notifications from null ls
+				{
+					filter = {
+						event = "lsp",
+						kind = "progress",
+						cond = function(message)
+							local title = vim.tbl_get(message.opts, "progress", "title")
+							local client = vim.tbl_get(message.opts, "progress", "client")
+
+							-- skip null-ls noisy messages
+							return client == "null-ls" and title == "code_action"
+						end,
+					},
+					opts = { skip = true },
+				},
+			},
+		},
+		dependencies = {
+			-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+			{ "MunifTanjim/nui.nvim", lazy = true },
+			"rcarriga/nvim-notify",
+		},
+	},
 
 	-- color schemes
-	----------------
-	use({
+	{
 		"folke/tokyonight.nvim",
+		lazy = false, -- make sure we load this during startup
+		priority = 1000, -- make sure to load this before all the other start plugins
 		config = function()
 			require("tokyonight").setup({
 				style = "moon",
 				transparent = true,
 			})
 
-			vim.cmd([[colorscheme tokyonight-moon]])
+			vim.cmd([[colorscheme tokyonight]])
 		end,
-	})
+	},
 
 	-- highlight color hex codes with their color (fast!)
-	use({
+	{
 		"norcalli/nvim-colorizer.lua",
-		config = function()
-			require("colorizer").setup({
-				"*",
-				"!packer",
-			})
-		end,
-	})
+		event = { "BufReadPost", "BufNewFile" },
+		opts = {
+			"*",
+			"!lazy",
+		},
+	},
 
 	-- highlight and search todo/fixme/hack etc comments
-	use({
+	{
 		"folke/todo-comments.nvim",
-		requires = "nvim-lua/plenary.nvim",
-		config = function()
-			require("todo-comments").setup({})
-		end,
-	})
+		event = { "BufReadPost", "BufNewFile" },
+		cmd = { "TodoTrouble", "TodoTelescope" },
+		dependencies = "nvim-lua/plenary.nvim",
+		opts = {},
+		keys = core_mappings.todo_comments_mappings,
+	},
 
 	-- status line
-	use({
+	{
 		"nvim-lualine/lualine.nvim",
-		requires = { "kyazdani42/nvim-web-devicons", opt = true },
+		event = "VeryLazy",
+		dependencies = { "nvim-tree/nvim-web-devicons", opt = true },
 		config = function()
 			require("plugins.lualine").setup()
 		end,
-	})
-
-	use({
-		"pwntester/octo.nvim",
-		requires = {
-			"nvim-lua/plenary.nvim",
-			"nvim-telescope/telescope.nvim",
-			"kyazdani42/nvim-web-devicons",
-		},
-		config = function()
-			require("octo").setup()
-		end,
-	})
+	},
 
 	-- Visual git gutter (also used by feline)
-	use({
+	{
 		"lewis6991/gitsigns.nvim",
-		requires = { "nvim-lua/plenary.nvim" },
-		config = function()
-			require("plugins.gitsigns").setup()
-		end,
-	})
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = { "nvim-lua/plenary.nvim" },
+		opts = require("plugins.gitsigns"),
+	},
 
 	-- syntax highlighting for zinit (zsh plugin manager)
-	use({ "zdharma-continuum/zinit-vim-syntax", ft = { "zsh" } })
+	{ "zdharma-continuum/zinit-vim-syntax", ft = { "zsh" } },
 
 	-- Comment out code easily
-	use({
+	{
 		"numToStr/Comment.nvim",
-		requires = {
+		event = { "BufReadPost", "BufNewFile" },
+		dependencies = {
 			"nvim-treesitter/nvim-treesitter",
 		},
 		config = function()
 			require("plugins.comment").setup()
 		end,
-	})
-
-	-- delete unused buffers
-	use({ "schickling/vim-bufonly", cmd = "BO" })
-
-	-- nginx syntax support
-	use({ "chr4/nginx.vim" })
-
-	-- run tests at the speed of thought
-	use({
-		"janko-m/vim-test",
-		requires = { "benmills/vimux" },
-		config = function()
-			vim.g["test#strategy"] = "vimux"
-			-- accommodations for Malomo's unusual folder structure on Dash
-			vim.cmd(
-				[[let test#javascript#jest#file_pattern = '\v(.*\.(spec|test|__tests__))\.(js|jsx|coffee|ts|tsx)$']]
-			)
-			require("core.mappings").vim_test_mappings()
-		end,
-	})
-
-	-- Highlight Yanked String
-	use({ "machakann/vim-highlightedyank" })
-
-	-- git integration
-	use({
-		"tpope/vim-fugitive",
-		config = function()
-			require("core.mappings").fugitive_mappings()
-		end,
-	})
-
-	-- github support for fugitive
-	use({
-		"tpope/vim-rhubarb",
-		requires = { "tpope/vim-fugitive" },
-	})
-
-	--  Better syntax highlighting (and more)
-	use({
+	},
+	--
+	-- -- {
+	-- --   "echasnovski/mini.bufremove",
+	-- --   keys = core_mappings.bufremove_mappings,
+	-- -- },
+	-- --
+	-- -- -- nginx syntax support
+	-- -- "chr4/nginx.vim",
+	-- --
+	-- -- -- run tests at the speed of thought
+	-- -- {
+	-- --   "janko-m/vim-test",
+	-- --   keys = core_mappings.vim_test_mappings,
+	-- --   dependencies = { "benmills/vimux" },
+	-- --   init = function()
+	-- --     vim.g["test#strategy"] = "vimux"
+	-- --     -- accommodations for Malomo's unusual folder structure on Dash
+	-- --     vim.cmd(
+	-- --       [[let test#javascript#jest#file_pattern = '\v(__tests__/.*|(spec|test|__tests__))\.(js|jsx|coffee|ts|tsx)$']]
+	-- --     )
+	-- --   end,
+	-- -- },
+	-- --
+	-- -- -- git integration
+	-- -- {
+	-- --   "tpope/vim-fugitive",
+	-- --   event = "VeryLazy",
+	-- --   config = function()
+	-- --     core_mappings.fugitive_mappings()
+	-- --   end,
+	-- -- },
+	-- --
+	-- -- -- github support for fugitive
+	-- -- {
+	-- --   "tpope/vim-rhubarb",
+	-- --   event = "VeryLazy",
+	-- --   dependencies = { "tpope/vim-fugitive" },
+	-- --   keys = core_mappings.rhubarb_mappings,
+	-- -- },
+	-- --
+	-- -- --  Better syntax highlighting (and more)
+	{
 		"nvim-treesitter/nvim-treesitter",
-		run = ":TSUpdate",
-		requires = {
+		build = ":TSUpdate",
+		dependencies = {
 			"nvim-treesitter/nvim-treesitter-textobjects",
-			"JoosepAlviste/nvim-ts-context-commentstring",
 			"RRethy/nvim-treesitter-endwise",
-			"nvim-treesitter/playground",
+			"nvim-treesitter/nvim-treesitter-context",
 		},
 		config = function()
 			require("plugins.treesitter").setup()
 		end,
-	})
-
-	-- support for MJML templates
-	use({
-		"amadeus/vim-mjml",
-	})
-
-	-- auto complete closable pairs
-	use({
-		"windwp/nvim-autopairs",
-		config = function()
-			require("nvim-autopairs").setup({})
-		end,
-	})
-
-	-- auto close html/tsx tags using TreeSitter
-	use({
-		"windwp/nvim-ts-autotag",
-		config = function()
-			require("nvim-ts-autotag").setup()
-		end,
-	})
-
-	-- winbar file title and lsp path
-	use({
-		"B4mbus/nvim-headband",
-		config = function()
-			require("nvim-headband").setup({
-				location_section = {
-					position = "right",
-				},
-			})
-		end,
-		after = "nvim-web-devicons",
-		requires = {
-			-- required for for the navic section to work
-			{ "SmiteshP/nvim-navic" },
-			-- required for for devicons and default location_section.separator
-			-- highlight group
-			{ "kyazdani42/nvim-web-devicons" },
+	},
+	--
+	{
+		"JoosepAlviste/nvim-ts-context-commentstring",
+		event = { "BufReadPre", "BufNewFile" },
+		opts = {},
+	},
+	--
+	-- -- -- play with Treesitter
+	{
+		"nvim-treesitter/playground",
+		cmd = "TSPlaygroundToggle",
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
 		},
-	})
-
-	-- file tree
-	use({
-		"kyazdani42/nvim-tree.lua",
-		requires = { "kyazdani42/nvim-web-devicons" },
-		config = function()
-			require("plugins.nvimtree").setup()
-		end,
-	})
-
-	-- Highlight current paragraph (works well with goyo)
-	use({
-		"junegunn/limelight.vim",
-		cmd = "Limelight",
-		setup = function()
-			vim.g.limelight_paragraph_span = 1
-			vim.g.limelight_priority = -1
-		end,
-	})
-
-	-- growing collection of settings, commands and require('core.mappings') put together to make
-	-- working with the location list/window and the quickfix list/window smoother
-	use({ "romainl/vim-qf" })
-
-	-- Simple plugin for placing signs in buffer's gutter next to lines that appear in the QuickFix results.
-	use({ "matthias-margush/qfx.vim" })
-
-	-- Simple plugin for placing signs in buffer's gutter next to lines that appear in the QuickFix results.
-	-- https://gitlab.com/hauleth/qfx.vim
-	use("https://gitlab.com/hauleth/qfx.vim.git")
+	},
+	--
+	-- -- -- support for MJML templates
+	-- -- -- NOTE: technically ftdetection dictates that this shouldn't be VeryLazy, but
+	-- -- -- the chances of me opening an mjml file as the first file are relatively
+	-- -- -- low, so I think this is OK
+	-- -- { "amadeus/vim-mjml", event = "VeryLazy" },
+	-- --
+	-- -- -- auto complete closable pairs
+	-- -- {
+	-- --   "windwp/nvim-autopairs",
+	-- --   event = "InsertEnter",
+	-- --   opts = {},
+	-- -- },
+	--
+	-- -- -- auto close html/tsx tags using TreeSitter
+	{
+		"windwp/nvim-ts-autotag",
+		ft = {
+			"html",
+			"javascript",
+			"typescript",
+			"javascriptreact",
+			"typescriptreact",
+			"svelte",
+			"vue",
+			"tsx",
+			"jsx",
+			"rescript",
+			"xml",
+			"php",
+			"markdown",
+			"astro",
+			"glimmer",
+			"handlebars",
+			"hbs",
+		},
+		opts = {},
+	},
+	--
+	-- -- -- file tree
+	-- -- {
+	-- --   "nvim-tree/nvim-tree.lua",
+	-- --   keys = core_mappings.nvim_tree_mappings,
+	-- --   cmd = "NvimTreeToggle",
+	-- --   dependencies = { "nvim-tree/nvim-web-devicons" },
+	-- --   opts = require("plugins.nvimtree"),
+	-- -- },
 
 	-- navigate to directory of current file using `-`
-	use({ "tpope/vim-vinegar" })
+	"tpope/vim-vinegar",
+	-- --
+	-- -- -- automatically adjusts 'shiftwidth' and 'expandtab' heuristically
+	-- -- "tpope/vim-sleuth",
+	-- --
+	-- --
+	-- -- Elixir: {{{
+	--
+	-- -- -- pulls info on hex packages (dependencies mattn/webapi-vim)
+	{ "lucidstack/hex.vim", ft = { "elixir" }, dependencies = { "mattn/webapi-vim" } },
+	-- --
+	-- -- -- Vim sugar for the UNIX shell commands that need it the most.
+	{
+		"tpope/vim-eunuch",
+		cmd = {
+			"Remove",
+			"Delete",
+			"Move",
+			"Rename",
+			"Copy",
+			"Duplicate",
+			"Chmod",
+			"Mkdir",
+			"Cfind",
+			"Clocate",
+			"Lfind",
+			"Llocate",
+			"Wall",
+			"SudoWrite",
+			"SudoEdit",
+		},
+	},
 
-	-- automatically adjusts 'shiftwidth' and 'expandtab' heuristically
-	use({ "tpope/vim-sleuth" })
-
-	-- ruby gem info directly in a Gemfile
-	use({ "alexbel/vim-rubygems", ft = { "ruby" } })
-
-	-- support for Gleam language
-	use({ "gleam-lang/gleam.vim" })
-
-	--  Erlang: {{{
-	-- erlang syntax
-	use({ "vim-erlang/vim-erlang-runtime" })
-	--  }}}
-
-	-- Elixir: {{{
-
-	-- elixir text objects
-	use({
-		"kevinkoltz/vim-textobj-elixir",
-		requires = { "kana/vim-textobj-user" },
-		ft = { "elixir" },
-	})
-
-	-- pulls info on hex packages (requires mattn/webapi-vim)
-	use({ "lucidstack/hex.vim", ft = { "elixir" } })
-	-- }}}
-
-	-- add text object for HTML attributes - allows dax cix etc
-	use({
-		"whatyouhide/vim-textobj-xmlattr",
-		requires = { "kana/vim-textobj-user" },
-	})
-
-	-- graphql support
-	use({ "jparise/vim-graphql" })
-
-	-- Vim sugar for the UNIX shell commands that need it the most.
-	use({ "tpope/vim-eunuch" })
-
-	-- allow (non-native) plugins to use the . command
-	use({ "tpope/vim-repeat" })
+	-- allow (non-native) plugins to the . command
+	{ "tpope/vim-repeat", event = "VeryLazy" },
 
 	-- Surround text with closures
-	use({ "tpope/vim-surround" })
+	{ "tpope/vim-surround", event = { "BufReadPost", "BufNewFile" } },
 
 	-- vim projectionist allows creating :Esomething custom shortcuts (required by vim rake)
-	use({
+	{
 		"tpope/vim-projectionist",
-		setup = function()
-			require("plugins.projectionist")
+		config = function()
+			require("plugins.projectionist").setup()
 		end,
-	})
+	},
 
-	-- vim unimpaired fixes daily annoyences
-	use({ "tpope/vim-unimpaired" })
-
-	-- abolish.vim: easily search for, substitute, and abbreviate multiple variants
-	-- of a word
-	use({ "tpope/vim-abolish" })
-
-	-- Support emacs keybindings in insert mode
-	use({ "tpope/vim-rsi" })
-
-	-- save vim sessions
-	use({ "tpope/vim-obsession" })
-
-	-- RagTag: Auto-close html tags + mappings for template scripting languages
-	use({ "tpope/vim-ragtag" })
-
+	-- vim unimpaired fixes daily annoyances
+	-- -- { "tpope/vim-unimpaired", event = "VeryLazy" },
+	-- --
+	-- -- -- abolish.vim: easily search for, substitute, and abbreviate multiple variants
+	-- -- -- of a word
+	-- -- { "tpope/vim-abolish", event = "VeryLazy" },
+	-- --
+	-- -- -- Support emacs keybindings in insert mode
+	-- -- { "tpope/vim-rsi", event = "VeryLazy" },
+	-- --
+	-- -- -- RagTag: Auto-close html tags + mappings for template scripting languages
+	-- -- -- TODO: add ft lazy loading
+	-- -- { "tpope/vim-ragtag", event = { "BufReadPost", "BufNewFile" } },
+	-- --
+	-- -- -- smarter gx mapping
+	-- -- {
+	-- --   "chrishrb/gx.nvim",
+	-- --   keys = { "gx" },
+	-- --   dependencies = { "nvim-lua/plenary.nvim" },
+	-- --   opts = {
+	-- --     handler_options = {
+	-- --       search_engine = "duckduckgo",
+	-- --     },
+	-- --   },
+	-- -- },
+	-- --
 	-- automatic bulleted lists
-	use({
+	{
 		"dkarter/bullets.vim",
-		setup = function()
+		init = function()
 			vim.g.bullets_enabled_file_types = {
 				"markdown",
 				"text",
@@ -434,193 +469,350 @@ return packer.startup(function(use)
 				"scratch",
 			}
 		end,
-	})
+		ft = {
+			"markdown",
+			"text",
+			"gitcommit",
+			"scratch",
+		},
+	},
 
 	-- replacement for matchit
-	use({
-		"andymass/vim-matchup",
-		setup = function()
-			vim.g.matchup_matchparen_deferred = 1
-		end,
-	})
-
-	-- window animations
-	use({ "camspiers/animate.vim" })
-
-	-- show trailing white spaces and automatically delete them on write
-	use({
-		"zakharykaplan/nvim-retrail",
+	-- -- {
+	-- --   "andymass/vim-matchup",
+	-- --   event = { "BufReadPost", "BufNewFile" },
+	-- --   init = function()
+	-- --     vim.g.matchup_matchparen_deferred = 1
+	-- --   end,
+	-- -- },
+	-- --
+	-- -- -- show trailing white spaces and automatically delete them on write
+	-- {
+	--  "zakharykaplan/nvim-retrail",
+	--  event = { "BufReadPost", "BufNewFile" },
+	--  opt = require("plugins.retrail"),
+	-- },
+	--
+	-- -- -- Convert code to multiline
+	-- -- {
+	-- --   "AndrewRadev/splitjoin.vim",
+	-- --   event = { "BufReadPost", "BufNewFile" },
+	-- --   init = function()
+	-- --     vim.g.splitjoin_align = 1
+	-- --     vim.g.splitjoin_trailing_comma = 1
+	-- --     vim.g.splitjoin_ruby_curly_braces = 0
+	-- --     vim.g.splitjoin_ruby_hanging_args = 0
+	-- --   end,
+	-- -- },
+	-- --
+	-- -- -- Toggle between different language verbs or syntax styles
+	-- -- {
+	-- --   "AndrewRadev/switch.vim",
+	-- --   event = { "BufReadPost", "BufNewFile" },
+	-- --   init = function()
+	-- --     vim.g.switch_custom_definitions = {
+	-- --       { "up", "down", "change" },
+	-- --       { "add", "drop", "remove" },
+	-- --       { "create", "drop" },
+	-- --       { "row", "column" },
+	-- --       { "first", "second", "third", "fourth", "fifth" },
+	-- --       { "yes", "no" },
+	-- --     }
+	-- --   end,
+	-- -- },
+	-- --
+	-- -- -- The ultimate undo history visualizer for VIM
+	-- -- {
+	-- --   "mbbill/undotree",
+	-- --   cmd = { "UndotreeToggle" },
+	-- --   keys = core_mappings.undotree_mappings,
+	-- -- },
+	-- --
+	-- -- --  Indent lines (visual indication)
+	-- -- {
+	-- --   "lukas-reineke/indent-blankline.nvim",
+	-- --   main = "ibl",
+	-- --   event = { "BufReadPost", "BufNewFile" },
+	-- --   opts = {
+	-- --     indent = {
+	-- --       char = "│",
+	-- --     },
+	-- --     exclude = {
+	-- --       filetypes = {
+	-- --         "",
+	-- --         "alpha",
+	-- --         "NvimTree",
+	-- --         "TelescopePrompt",
+	-- --         "checkhealth",
+	-- --         "dashboard",
+	-- --         "help",
+	-- --         "lazy",
+	-- --         "lazyterm",
+	-- --         "lspinfo",
+	-- --         "man",
+	-- --         "mason",
+	-- --         "notify",
+	-- --         "nofile",
+	-- --         "qf",
+	-- --         "quickfix",
+	-- --         "terminal",
+	-- --       },
+	-- --     },
+	-- --     scope = {
+	-- --       enabled = false,
+	-- --     },
+	-- --   },
+	-- -- },
+	-- --
+	-- -- -- Active indent guide and indent text objects. When you're browsing
+	-- -- -- code, this highlights the current level of indentation, and animates
+	-- -- -- the highlighting.
+	-- {
+	--  "echasnovski/mini.indentscope",
+	--  version = false, -- wait till new 0.7.0 release to put it back on semver
+	--  event = { "BufReadPre", "BufNewFile" },
+	--  opts = {
+	--    -- symbol = "▏",
+	--    symbol = "│",
+	--    options = { try_as_border = true },
+	--  },
+	--  init = function()
+	--    vim.api.nvim_create_autocmd("FileType", {
+	--      pattern = {
+	--        "",
+	--        "alpha",
+	--        "NvimTree",
+	--        "TelescopePrompt",
+	--        "checkhealth",
+	--        "dashboard",
+	--        "help",
+	--        "lazy",
+	--        "lazyterm",
+	--        "lspinfo",
+	--        "man",
+	--        "mason",
+	--        "notify",
+	--        "nofile",
+	--        "qf",
+	--        "quickfix",
+	--        "terminal",
+	--      },
+	--      callback = function()
+	--        vim.b.miniindentscope_disable = true
+	--      end,
+	--    })
+	--  end,
+	-- },
+	--
+	-- -- start page
+	{
+		"goolord/alpha-nvim",
+		event = "VimEnter",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
-			require("plugins.retrail").setup()
-		end,
-	})
+			local alpha = require("alpha")
+			local dashboard = require("alpha.themes.dashboard")
 
-	-- Convert code to multiline
-	use({
-		"AndrewRadev/splitjoin.vim",
-		setup = function()
-			vim.g.splitjoin_align = 1
-			vim.g.splitjoin_trailing_comma = 1
-			vim.g.splitjoin_ruby_curly_braces = 0
-			vim.g.splitjoin_ruby_hanging_args = 0
-		end,
-	})
-
-	-- Toggle between different language verbs or syntax styles
-	use({
-		"AndrewRadev/switch.vim",
-		setup = function()
-			vim.g.switch_custom_definitions = {
-				{ "up", "down", "change" },
-				{ "add", "drop", "remove" },
-				{ "create", "drop" },
-				{ "row", "column" },
-				{ "first", "second", "third", "fourth", "fifth" },
-				{ "yes", "no" },
+			-- Set header
+			dashboard.section.header.val = {
+				"                                                     ",
+				"  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
+				"  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
+				"  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
+				"  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
+				"  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
+				"  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
+				"                                                     ",
 			}
+
+			dashboard.section.buttons.val = {
+				dashboard.button("f", " " .. " Find file", ":Telescope find_files <CR>"),
+				dashboard.button("n", " " .. " New file", ":ene <BAR> startinsert <CR>"),
+				dashboard.button("s", " " .. " Git Status files", ":Telescope git_status<CR>"),
+				dashboard.button("r", " " .. " Recent files", ":Telescope oldfiles <CR>"),
+				dashboard.button("g", " " .. " Grep", ":FzfRg!<CR>"),
+				dashboard.button("c", " " .. " Config", ":lua require('plugins.telescope').find_dotfiles()<CR>"),
+				dashboard.button("l", "󰒲 " .. " Lazy", ":Lazy<CR>"),
+				dashboard.button("q", " " .. " Quit", ":qa<CR>"),
+			}
+
+			alpha.setup(dashboard.opts)
+
+			vim.api.nvim_create_autocmd("User", {
+				pattern = "LazyVimStarted",
+				callback = function()
+					local stats = require("lazy").stats()
+					local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+          -- stylua: ignore
+          dashboard.section.footer.val = '⚡ ' .. stats.count .. ' plugins loaded in ' .. ms .. 'ms'
+					pcall(vim.cmd.AlphaRedraw)
+				end,
+			})
 		end,
-	})
-
-	-- The ultimate undo history visualizer for VIM
-	use({
-		"mbbill/undotree",
-		config = function()
-			require("core.mappings").undotree_mappings()
-		end,
-	})
-
-	-- Rust support
-	use({ "rust-lang/rust.vim", ft = { "rust" } })
-
-	--  Indent lines (visual indication)
-	use({
-		"lukas-reineke/indent-blankline.nvim",
-		config = function()
-			require("plugins.indent_blankline").setup()
-		end,
-	})
-
-	-- resize windows in vim naturally
-	use({
-		"simeji/winresizer",
-		cmd = "WinResizerStartResize",
-		config = function()
-			require("core.mappings").winresizer_mappings()
-		end,
-	})
-
-	-- smooth scrolling in neovim
-	use({
-		"declancm/cinnamon.nvim",
-		config = function()
-			require("cinnamon").setup()
-		end,
-	})
-
-	-- fuzzy finder (still used by a lot of small workflows I built FzfRg,
-	-- GConflict etc)
-	use({ "junegunn/fzf", run = "cd ~/.fzf && ./install --all" })
-	use("junegunn/fzf.vim")
-
-	use({
+	},
+	--
+	-- -- -- fuzzy find things
+	{
 		"nvim-telescope/telescope.nvim",
-		requires = {
+		cmd = "Telescope",
+		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-telescope/telescope-file-browser.nvim",
-			"nvim-telescope/telescope-packer.nvim",
 			"nvim-telescope/telescope-github.nvim",
 			"olacin/telescope-cc.nvim",
-			"nvim-telescope/telescope-ui-select.nvim",
-			{ "nvim-telescope/telescope-fzf-native.nvim", run = "make" },
-			"m-demare/attempt.nvim",
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			"folke/tokyonight.nvim",
+			"nvim-telescope/telescope-symbols.nvim",
+			-- Telescope uses treesitter for previews
+			"nvim-treesitter/nvim-treesitter",
 		},
 		config = function()
 			require("plugins.telescope").setup()
 		end,
-	})
+		keys = core_mappings.telescope_mappings,
+	},
 
-	-- use Neovim inside Firefox
-	use({
-		"glacambre/firenvim",
-		run = function()
-			vim.fn["firenvim#install"](0)
+	{ "junegunn/fzf", event = "VeryLazy", build = ":call fzf#install()" },
+
+	{
+		"junegunn/fzf.vim",
+		event = "VeryLazy",
+		config = function()
+			vim.cmd([[
+         command! -bang -nargs=* FzfRg
+           \ call fzf#vim#grep(
+           \   'rg --column --line-number --no-heading --color=always --smart-case --hidden '.shellescape(<q-args>), 1,
+           \   <bang>0 ? fzf#vim#with_preview('up:60%')
+           \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+           \   <bang>0)
+
+         nnoremap <silent> <C-g>g :FzfRg!<CR>
+       ]])
 		end,
-	})
+	},
+
+	-- better ui for vim.ui commands
+	{
+		"stevearc/dressing.nvim",
+		lazy = true,
+		init = function()
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.ui.select = function(...)
+				require("lazy").load({ plugins = { "dressing.nvim" } })
+				return vim.ui.select(...)
+			end
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.ui.input = function(...)
+				require("lazy").load({ plugins = { "dressing.nvim" } })
+				return vim.ui.input(...)
+			end
+		end,
+	},
 
 	-- RipGrep - grep is dead. All hail the new king RipGrep.
-	use({
+	{
 		"jremmen/vim-ripgrep",
-		setup = function()
-			-- allow hidden files to be searched and use smart case
+		cmd = "Rg",
+		init = function()
+			-- allow hidden files to be searched and smart case
 			vim.g.rg_command = "rg --vimgrep --hidden --smart-case"
 			vim.g.rg_highlight = 1
 		end,
-		config = function()
-			require("core.mappings").ripgrep_mappings()
+		keys = core_mappings.ripgrep_mappings,
+	},
+
+	-- displays a popup with possible key bindings e.g. <leader>f will show f as
+	-- the next possible character
+	{
+		"folke/which-key.nvim",
+		event = "VeryLazy",
+		init = function()
+			vim.o.timeout = true
+			vim.o.timeoutlen = 300
 		end,
-	})
+		opts = {},
+	},
 
 	-- same as tabular but by Junegunn and way easier
-	use({
+	{
 		"junegunn/vim-easy-align",
-		config = function()
-			require("core.mappings").easy_align_mappings()
-		end,
-	})
+		cmd = "EasyAlign",
+		keys = core_mappings.easy_align_mappings,
+	},
 
 	-- Single tabpage interface for easily cycling through diffs for all modified files for any git rev.
-	use({
+	{
 		"sindrets/diffview.nvim",
-		requires = {
+		cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+		dependencies = {
 			"nvim-lua/plenary.nvim",
-			"kyazdani42/nvim-web-devicons",
+			"nvim-tree/nvim-web-devicons",
 		},
-	})
-
-	-- manage github gists
-	use({ "mattn/gist-vim", cmd = "Gist", requires = { "mattn/webapi-vim" } })
-
-	-- PostgreSQL highlighting
-	use("exu/pgsql.vim")
+		keys = core_mappings.diffview_mappings,
+	},
 
 	-- Helm Chart syntax
-	use("towolf/vim-helm")
-
-	-- attempt stuff using scratch buffer and pre-configured bootstrap
-	use({
-		"m-demare/attempt.nvim",
-		requires = {
-			"nvim-lua/plenary.nvim",
-		},
-		config = function()
-			require("plugins.attempt").setup()
-		end,
-	})
+	{ "towolf/vim-helm", event = { "BufReadPre", "BufNewFile" } },
 
 	--- TMUX ---
 
 	-- tmux config file stuff
-	use({ "tmux-plugins/vim-tmux", ft = "tmux" })
+	{ "tmux-plugins/vim-tmux", ft = "tmux" },
 
-	-- seamless tmux/vim pane navigation
-	use({ "christoomey/vim-tmux-navigator" })
-
-	-- Resize tmux panes and Vim windows with ease.
-	use("RyanMillerC/better-vim-tmux-resizer")
-
-	-- support editorconfig files
-	use({ "gpanders/editorconfig.nvim" })
+	{
+		"aserowy/tmux.nvim",
+		event = "VeryLazy",
+		opts = {},
+	},
 
 	-- notifications
-	use({
+	{
 		"rcarriga/nvim-notify",
-		config = function()
+		opts = {
+			background_colour = "#000",
+		},
+		config = function(_notify, opts)
 			local notify = require("notify")
-			notify.setup({
-				background_colour = "#000",
-			})
+			notify.setup(opts)
 			vim.notify = notify
+			core_mappings.notify_mappings()
 		end,
-	})
-end)
+	},
+}, {
+	concurrency = 8,
+	-- Uncomment to debug an issue with a plugin by disabling all other plugins
+	-- defaults = {
+	--   cond = function(plugin)
+	--     local _, plugin_name = next(plugin)
+	--
+	--     local enabledPlugins = { 'foo', 'bar', 'baz' }
+	--     local found = false
+	--
+	--     for _, value in ipairs(enabledPlugins) do
+	--       if value == plugin_name then
+	--         return true
+	--       end
+	--     end
+	--
+	--     return false
+	--   end,
+	-- },
+	checker = {
+		enabled = true,
+		notify = false,
+	},
+	performance = {
+		rtp = {
+			---@type string[] list any plugins you want to disable here
+			disabled_plugins = {
+				"gzip",
+				"matchit",
+				"matchparen",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+			},
+		},
+	},
+})
