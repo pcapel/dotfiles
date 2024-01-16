@@ -38,7 +38,7 @@ require("lazy").setup({
 		end,
 	},
 
-	-- -- installs/updates LSPs, linters and DAPs
+	-- installs/updates LSPs, linters and DAPs
 	{
 		"williamboman/mason.nvim",
 		build = ":MasonUpdate",
@@ -46,10 +46,8 @@ require("lazy").setup({
 		dependencies = {
 			-- handles connection of LSP Configs and Mason
 			"williamboman/mason-lspconfig.nvim",
-
 			-- Collection of configurations for the built-in LSP client
 			"neovim/nvim-lspconfig",
-
 			-- required for setting up capabilities for cmp
 			"hrsh7th/cmp-nvim-lsp",
 		},
@@ -135,8 +133,8 @@ require("lazy").setup({
 		keys = core_mappings.trouble_mappings,
 		opts = {},
 	},
-	--
-	-- -- -- modern vim command line replacement, requires nvim 0.9 or higher
+
+	-- modern vim command line replacement, requires nvim 0.9 or higher
 	{
 		"folke/noice.nvim",
 		enabled = true,
@@ -216,7 +214,7 @@ require("lazy").setup({
 		end,
 	},
 
-	-- highlight color hex codes with their color (fast!)
+	-- -- highlight color hex codes with their color (fast!)
 	{
 		"norcalli/nvim-colorizer.lua",
 		event = { "BufReadPost", "BufNewFile" },
@@ -268,47 +266,44 @@ require("lazy").setup({
 			require("plugins.comment").setup()
 		end,
 	},
-	--
-	-- -- {
-	-- --   "echasnovski/mini.bufremove",
-	-- --   keys = core_mappings.bufremove_mappings,
-	-- -- },
-	-- --
-	-- -- -- nginx syntax support
-	-- -- "chr4/nginx.vim",
-	-- --
-	-- -- -- run tests at the speed of thought
-	-- -- {
-	-- --   "janko-m/vim-test",
-	-- --   keys = core_mappings.vim_test_mappings,
-	-- --   dependencies = { "benmills/vimux" },
-	-- --   init = function()
-	-- --     vim.g["test#strategy"] = "vimux"
-	-- --     -- accommodations for Malomo's unusual folder structure on Dash
-	-- --     vim.cmd(
-	-- --       [[let test#javascript#jest#file_pattern = '\v(__tests__/.*|(spec|test|__tests__))\.(js|jsx|coffee|ts|tsx)$']]
-	-- --     )
-	-- --   end,
-	-- -- },
-	-- --
-	-- -- -- git integration
-	-- -- {
-	-- --   "tpope/vim-fugitive",
-	-- --   event = "VeryLazy",
-	-- --   config = function()
-	-- --     core_mappings.fugitive_mappings()
-	-- --   end,
-	-- -- },
-	-- --
-	-- -- -- github support for fugitive
-	-- -- {
-	-- --   "tpope/vim-rhubarb",
-	-- --   event = "VeryLazy",
-	-- --   dependencies = { "tpope/vim-fugitive" },
-	-- --   keys = core_mappings.rhubarb_mappings,
-	-- -- },
-	-- --
-	-- -- --  Better syntax highlighting (and more)
+
+	{
+		"echasnovski/mini.bufremove",
+		keys = core_mappings.bufremove_mappings,
+	},
+
+	-- nginx syntax support
+	"chr4/nginx.vim",
+
+	-- run tests at the speed of thought
+	{
+		"janko-m/vim-test",
+		keys = core_mappings.vim_test_mappings,
+		dependencies = { "benmills/vimux" },
+		init = function()
+			vim.g["test#strategy"] = "vimux"
+		end,
+	},
+	-- git integration
+	{
+		"tpope/vim-fugitive",
+		event = "VeryLazy",
+		config = function()
+			core_mappings.fugitive_mappings()
+		end,
+	},
+
+	-- github support for fugitive
+	{
+		"tpope/vim-rhubarb",
+		event = "VeryLazy",
+		dependencies = { "tpope/vim-fugitive" },
+		keys = core_mappings.rhubarb_mappings,
+	},
+
+	--  Better syntax highlighting (and more)
+	--  I have to use TSBuffDisable highlight on the init file, likely becuase of
+	--  the comments, but that's really not ideal IMO
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
@@ -321,14 +316,14 @@ require("lazy").setup({
 			require("plugins.treesitter").setup()
 		end,
 	},
-	--
+
 	{
 		"JoosepAlviste/nvim-ts-context-commentstring",
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {},
 	},
-	--
-	-- -- -- play with Treesitter
+
+	-- play with Treesitter
 	{
 		"nvim-treesitter/playground",
 		cmd = "TSPlaygroundToggle",
@@ -336,21 +331,8 @@ require("lazy").setup({
 			"nvim-treesitter/nvim-treesitter",
 		},
 	},
-	--
-	-- -- -- support for MJML templates
-	-- -- -- NOTE: technically ftdetection dictates that this shouldn't be VeryLazy, but
-	-- -- -- the chances of me opening an mjml file as the first file are relatively
-	-- -- -- low, so I think this is OK
-	-- -- { "amadeus/vim-mjml", event = "VeryLazy" },
-	-- --
-	-- -- -- auto complete closable pairs
-	-- -- {
-	-- --   "windwp/nvim-autopairs",
-	-- --   event = "InsertEnter",
-	-- --   opts = {},
-	-- -- },
-	--
-	-- -- -- auto close html/tsx tags using TreeSitter
+
+	-- auto close html/tsx tags using TreeSitter
 	{
 		"windwp/nvim-ts-autotag",
 		ft = {
@@ -374,29 +356,19 @@ require("lazy").setup({
 		},
 		opts = {},
 	},
-	--
-	-- -- -- file tree
-	-- -- {
-	-- --   "nvim-tree/nvim-tree.lua",
-	-- --   keys = core_mappings.nvim_tree_mappings,
-	-- --   cmd = "NvimTreeToggle",
-	-- --   dependencies = { "nvim-tree/nvim-web-devicons" },
-	-- --   opts = require("plugins.nvimtree"),
-	-- -- },
 
 	-- navigate to directory of current file using `-`
 	"tpope/vim-vinegar",
-	-- --
-	-- -- -- automatically adjusts 'shiftwidth' and 'expandtab' heuristically
-	-- -- "tpope/vim-sleuth",
-	-- --
-	-- --
-	-- -- Elixir: {{{
+
+	-- -- automatically adjusts 'shiftwidth' and 'expandtab' heuristically
+	"tpope/vim-sleuth",
+
+	-- Elixir: {{{
 	--
 	-- -- -- pulls info on hex packages (dependencies mattn/webapi-vim)
 	{ "lucidstack/hex.vim", ft = { "elixir" }, dependencies = { "mattn/webapi-vim" } },
-	-- --
-	-- -- -- Vim sugar for the UNIX shell commands that need it the most.
+	--
+	-- -- Vim sugar for the UNIX shell commands that need it the most.
 	{
 		"tpope/vim-eunuch",
 		cmd = {
@@ -420,8 +392,8 @@ require("lazy").setup({
 
 	-- allow (non-native) plugins to the . command
 	{ "tpope/vim-repeat", event = "VeryLazy" },
-
-	-- Surround text with closures
+	--
+	-- -- Surround text with closures
 	{ "tpope/vim-surround", event = { "BufReadPost", "BufNewFile" } },
 
 	-- vim projectionist allows creating :Esomething custom shortcuts (required by vim rake)
@@ -433,31 +405,31 @@ require("lazy").setup({
 	},
 
 	-- vim unimpaired fixes daily annoyances
-	-- -- { "tpope/vim-unimpaired", event = "VeryLazy" },
-	-- --
-	-- -- -- abolish.vim: easily search for, substitute, and abbreviate multiple variants
-	-- -- -- of a word
-	-- -- { "tpope/vim-abolish", event = "VeryLazy" },
-	-- --
-	-- -- -- Support emacs keybindings in insert mode
-	-- -- { "tpope/vim-rsi", event = "VeryLazy" },
-	-- --
-	-- -- -- RagTag: Auto-close html tags + mappings for template scripting languages
-	-- -- -- TODO: add ft lazy loading
-	-- -- { "tpope/vim-ragtag", event = { "BufReadPost", "BufNewFile" } },
-	-- --
-	-- -- -- smarter gx mapping
-	-- -- {
-	-- --   "chrishrb/gx.nvim",
-	-- --   keys = { "gx" },
-	-- --   dependencies = { "nvim-lua/plenary.nvim" },
-	-- --   opts = {
-	-- --     handler_options = {
-	-- --       search_engine = "duckduckgo",
-	-- --     },
-	-- --   },
-	-- -- },
-	-- --
+	{ "tpope/vim-unimpaired", event = "VeryLazy" },
+
+	-- abolish.vim: easily search for, substitute, and abbreviate multiple variants
+	-- of a word
+	{ "tpope/vim-abolish", event = "VeryLazy" },
+
+	-- Support emacs keybindings in insert mode
+	{ "tpope/vim-rsi", event = "VeryLazy" },
+
+	-- RagTag: Auto-close html tags + mappings for template scripting languages
+	-- TODO: add ft lazy loading
+	{ "tpope/vim-ragtag", event = { "BufReadPost", "BufNewFile" } },
+
+	-- smarter gx mapping
+	{
+		"chrishrb/gx.nvim",
+		keys = { "gx" },
+		dependencies = { "nvim-lua/plenary.nvim" },
+		opts = {
+			handler_options = {
+				search_engine = "duckduckgo",
+			},
+		},
+	},
+
 	-- automatic bulleted lists
 	{
 		"dkarter/bullets.vim",
@@ -478,180 +450,179 @@ require("lazy").setup({
 	},
 
 	-- replacement for matchit
-	-- -- {
-	-- --   "andymass/vim-matchup",
-	-- --   event = { "BufReadPost", "BufNewFile" },
-	-- --   init = function()
-	-- --     vim.g.matchup_matchparen_deferred = 1
-	-- --   end,
-	-- -- },
-	-- --
-	-- -- -- show trailing white spaces and automatically delete them on write
-	-- {
-	--  "zakharykaplan/nvim-retrail",
-	--  event = { "BufReadPost", "BufNewFile" },
-	--  opt = require("plugins.retrail"),
-	-- },
-	--
-	-- -- -- Convert code to multiline
-	-- -- {
-	-- --   "AndrewRadev/splitjoin.vim",
-	-- --   event = { "BufReadPost", "BufNewFile" },
-	-- --   init = function()
-	-- --     vim.g.splitjoin_align = 1
-	-- --     vim.g.splitjoin_trailing_comma = 1
-	-- --     vim.g.splitjoin_ruby_curly_braces = 0
-	-- --     vim.g.splitjoin_ruby_hanging_args = 0
-	-- --   end,
-	-- -- },
-	-- --
-	-- -- -- Toggle between different language verbs or syntax styles
-	-- -- {
-	-- --   "AndrewRadev/switch.vim",
-	-- --   event = { "BufReadPost", "BufNewFile" },
-	-- --   init = function()
-	-- --     vim.g.switch_custom_definitions = {
-	-- --       { "up", "down", "change" },
-	-- --       { "add", "drop", "remove" },
-	-- --       { "create", "drop" },
-	-- --       { "row", "column" },
-	-- --       { "first", "second", "third", "fourth", "fifth" },
-	-- --       { "yes", "no" },
-	-- --     }
-	-- --   end,
-	-- -- },
-	-- --
-	-- -- -- The ultimate undo history visualizer for VIM
-	-- -- {
-	-- --   "mbbill/undotree",
-	-- --   cmd = { "UndotreeToggle" },
-	-- --   keys = core_mappings.undotree_mappings,
-	-- -- },
-	-- --
-	-- -- --  Indent lines (visual indication)
-	-- -- {
-	-- --   "lukas-reineke/indent-blankline.nvim",
-	-- --   main = "ibl",
-	-- --   event = { "BufReadPost", "BufNewFile" },
-	-- --   opts = {
-	-- --     indent = {
-	-- --       char = "│",
-	-- --     },
-	-- --     exclude = {
-	-- --       filetypes = {
-	-- --         "",
-	-- --         "alpha",
-	-- --         "NvimTree",
-	-- --         "TelescopePrompt",
-	-- --         "checkhealth",
-	-- --         "dashboard",
-	-- --         "help",
-	-- --         "lazy",
-	-- --         "lazyterm",
-	-- --         "lspinfo",
-	-- --         "man",
-	-- --         "mason",
-	-- --         "notify",
-	-- --         "nofile",
-	-- --         "qf",
-	-- --         "quickfix",
-	-- --         "terminal",
-	-- --       },
-	-- --     },
-	-- --     scope = {
-	-- --       enabled = false,
-	-- --     },
-	-- --   },
-	-- -- },
-	-- --
-	-- -- -- Active indent guide and indent text objects. When you're browsing
-	-- -- -- code, this highlights the current level of indentation, and animates
-	-- -- -- the highlighting.
-	-- {
-	--  "echasnovski/mini.indentscope",
-	--  version = false, -- wait till new 0.7.0 release to put it back on semver
-	--  event = { "BufReadPre", "BufNewFile" },
-	--  opts = {
-	--    -- symbol = "▏",
-	--    symbol = "│",
-	--    options = { try_as_border = true },
-	--  },
-	--  init = function()
-	--    vim.api.nvim_create_autocmd("FileType", {
-	--      pattern = {
-	--        "",
-	--        "alpha",
-	--        "NvimTree",
-	--        "TelescopePrompt",
-	--        "checkhealth",
-	--        "dashboard",
-	--        "help",
-	--        "lazy",
-	--        "lazyterm",
-	--        "lspinfo",
-	--        "man",
-	--        "mason",
-	--        "notify",
-	--        "nofile",
-	--        "qf",
-	--        "quickfix",
-	--        "terminal",
-	--      },
-	--      callback = function()
-	--        vim.b.miniindentscope_disable = true
-	--      end,
-	--    })
-	--  end,
-	-- },
-	--
-	-- -- start page
 	{
-		"goolord/alpha-nvim",
-		event = "VimEnter",
-		dependencies = { "nvim-tree/nvim-web-devicons" },
-		config = function()
-			local alpha = require("alpha")
-			local dashboard = require("alpha.themes.dashboard")
+		"andymass/vim-matchup",
+		event = { "BufReadPost", "BufNewFile" },
+		init = function()
+			vim.g.matchup_matchparen_deferred = 1
+		end,
+	},
 
-			-- Set header
-			dashboard.section.header.val = {
-				"                                                     ",
-				"  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
-				"  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
-				"  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
-				"  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
-				"  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
-				"  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
-				"                                                     ",
+	-- show trailing white spaces and automatically delete them on write
+	{
+		"zakharykaplan/nvim-retrail",
+		event = { "BufReadPost", "BufNewFile" },
+		opt = require("plugins.retrail"),
+	},
+
+	-- Convert code to multiline
+	{
+		"AndrewRadev/splitjoin.vim",
+		event = { "BufReadPost", "BufNewFile" },
+		init = function()
+			vim.g.splitjoin_align = 1
+			vim.g.splitjoin_trailing_comma = 1
+			vim.g.splitjoin_ruby_curly_braces = 0
+			vim.g.splitjoin_ruby_hanging_args = 0
+		end,
+	},
+
+	-- Toggle between different language verbs or syntax styles
+	{
+		"AndrewRadev/switch.vim",
+		event = { "BufReadPost", "BufNewFile" },
+		init = function()
+			vim.g.switch_custom_definitions = {
+				{ "up", "down", "change" },
+				{ "add", "drop", "remove" },
+				{ "create", "drop" },
+				{ "row", "column" },
+				{ "first", "second", "third", "fourth", "fifth" },
+				{ "yes", "no" },
 			}
+		end,
+	},
 
-			dashboard.section.buttons.val = {
-				dashboard.button("f", " " .. " Find file", ":Telescope find_files <CR>"),
-				dashboard.button("n", " " .. " New file", ":ene <BAR> startinsert <CR>"),
-				dashboard.button("s", " " .. " Git Status files", ":Telescope git_status<CR>"),
-				dashboard.button("r", " " .. " Recent files", ":Telescope oldfiles <CR>"),
-				dashboard.button("g", " " .. " Grep", ":FzfRg!<CR>"),
-				dashboard.button("c", " " .. " Config", ":lua require('plugins.telescope').find_dotfiles()<CR>"),
-				dashboard.button("l", "󰒲 " .. " Lazy", ":Lazy<CR>"),
-				dashboard.button("q", " " .. " Quit", ":qa<CR>"),
-			}
+	-- The ultimate undo history visualizer for VIM
+	{
+		"mbbill/undotree",
+		cmd = { "UndotreeToggle" },
+		keys = core_mappings.undotree_mappings,
+	},
 
-			alpha.setup(dashboard.opts)
-
-			vim.api.nvim_create_autocmd("User", {
-				pattern = "LazyVimStarted",
+	--  Indent lines (visual indication)
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		main = "ibl",
+		event = { "BufReadPost", "BufNewFile" },
+		opts = {
+			indent = {
+				char = "│",
+			},
+			exclude = {
+				filetypes = {
+					"",
+					"alpha",
+					"NvimTree",
+					"TelescopePrompt",
+					"checkhealth",
+					"dashboard",
+					"help",
+					"lazy",
+					"lazyterm",
+					"lspinfo",
+					"man",
+					"mason",
+					"notify",
+					"nofile",
+					"qf",
+					"quickfix",
+					"terminal",
+				},
+			},
+			scope = {
+				enabled = false,
+			},
+		},
+	},
+	--
+	-- Active indent guide and indent text objects. When you're browsing
+	-- code, this highlights the current level of indentation, and animates
+	-- the highlighting.
+	{
+		"echasnovski/mini.indentscope",
+		version = false, -- wait till new 0.7.0 release to put it back on semver
+		event = { "BufReadPre", "BufNewFile" },
+		opts = {
+			-- symbol = "▏",
+			symbol = "│",
+			options = { try_as_border = true },
+		},
+		init = function()
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = {
+					"",
+					"alpha",
+					"NvimTree",
+					"TelescopePrompt",
+					"checkhealth",
+					"dashboard",
+					"help",
+					"lazy",
+					"lazyterm",
+					"lspinfo",
+					"man",
+					"mason",
+					"notify",
+					"nofile",
+					"qf",
+					"quickfix",
+					"terminal",
+				},
 				callback = function()
-					local stats = require("lazy").stats()
-					local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-          -- stylua: ignore
-          dashboard.section.footer.val = '⚡ ' .. stats.count .. ' plugins loaded in ' .. ms .. 'ms'
-					pcall(vim.cmd.AlphaRedraw)
+					vim.b.miniindentscope_disable = true
 				end,
 			})
 		end,
 	},
+	-- --
+	-- -- -- start page
+	-- {
+	--     "goolord/alpha-nvim",
+	--     event = "VimEnter", dependencies = { "nvim-tree/nvim-web-devicons" },
+	--     config = function()
+	--         local alpha = require("alpha")
+	--         local dashboard = require("alpha.themes.dashboard")
 	--
-	-- -- -- fuzzy find things
+	--         -- Set header
+	--         dashboard.section.header.val = {
+	--             "                                                     ",
+	--             "  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
+	--             "  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
+	--             "  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
+	--             "  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
+	--             "  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
+	--             "  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
+	--             "                                                     ",
+	--         }
+	--
+	--         dashboard.section.buttons.val = {
+	--             dashboard.button("f", " " .. " Find file", ":Telescope find_files <CR>"),
+	--             dashboard.button("n", " " .. " New file", ":ene <BAR> startinsert <CR>"),
+	--             dashboard.button("s", " " .. " Git Status files", ":Telescope git_status<CR>"),
+	--             dashboard.button("r", " " .. " Recent files", ":Telescope oldfiles <CR>"),
+	--             dashboard.button("g", " " .. " Grep", ":FzfRg!<CR>"),
+	--             dashboard.button("c", " " .. " Config", ":lua require('plugins.telescope').find_dotfiles()<CR>"),
+	--             dashboard.button("l", "󰒲 " .. " Lazy", ":Lazy<CR>"),
+	--             dashboard.button("q", " " .. " Quit", ":qa<CR>"),
+	--         }
+	--
+	--         alpha.setup(dashboard.opts)
+	--
+	--         vim.api.nvim_create_autocmd("User", {
+	--             pattern = "LazyVimStarted",
+	--             callback = function()
+	--                 local stats = require("lazy").stats()
+	--                 local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+	--       -- stylua: ignore
+	--       dashboard.section.footer.val = '⚡ ' .. stats.count .. ' plugins loaded in ' .. ms .. 'ms'
+	--                 pcall(vim.cmd.AlphaRedraw)
+	--             end,
+	--         })
+	--     end,
+	-- },
+	-- --
+	-- -- -- -- fuzzy find things
 	{
 		"nvim-telescope/telescope.nvim",
 		cmd = "Telescope",
@@ -673,25 +644,25 @@ require("lazy").setup({
 	},
 
 	{ "junegunn/fzf", event = "VeryLazy", build = ":call fzf#install()" },
-
+	--
 	{
 		"junegunn/fzf.vim",
 		event = "VeryLazy",
 		config = function()
 			vim.cmd([[
-         command! -bang -nargs=* FzfRg
-           \ call fzf#vim#grep(
-           \   'rg --column --line-number --no-heading --color=always --smart-case --hidden '.shellescape(<q-args>), 1,
-           \   <bang>0 ? fzf#vim#with_preview('up:60%')
-           \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-           \   <bang>0)
+	     command! -bang -nargs=* FzfRg
+	       \ call fzf#vim#grep(
+	       \   'rg --column --line-number --no-heading --color=always --smart-case --hidden '.shellescape(<q-args>), 1,
+	       \   <bang>0 ? fzf#vim#with_preview('up:60%')
+	       \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+	       \   <bang>0)
 
-         nnoremap <silent> <C-g>g :FzfRg!<CR>
-       ]])
+	     nnoremap <silent> <C-g>g :FzfRg!<CR>
+	   ]])
 		end,
 	},
-
-	-- better ui for vim.ui commands
+	--
+	-- -- better ui for vim.ui commands
 	{
 		"stevearc/dressing.nvim",
 		lazy = true,
@@ -708,8 +679,8 @@ require("lazy").setup({
 			end
 		end,
 	},
-
-	-- RipGrep - grep is dead. All hail the new king RipGrep.
+	--
+	-- -- RipGrep - grep is dead. All hail the new king RipGrep.
 	{
 		"jremmen/vim-ripgrep",
 		cmd = "Rg",
@@ -720,7 +691,7 @@ require("lazy").setup({
 		end,
 		keys = core_mappings.ripgrep_mappings,
 	},
-
+	--
 	-- displays a popup with possible key bindings e.g. <leader>f will show f as
 	-- the next possible character
 	{
@@ -733,7 +704,7 @@ require("lazy").setup({
 		opts = {},
 	},
 
-	-- same as tabular but by Junegunn and way easier
+	-- -- same as tabular but by Junegunn and way easier
 	{
 		"junegunn/vim-easy-align",
 		cmd = "EasyAlign",
@@ -751,21 +722,18 @@ require("lazy").setup({
 		keys = core_mappings.diffview_mappings,
 	},
 
-	-- Helm Chart syntax
-	{ "towolf/vim-helm", event = { "BufReadPre", "BufNewFile" } },
-
-	--- TMUX ---
-
-	-- tmux config file stuff
+	-- --- TMUX ---
+	--
+	-- -- tmux config file stuff
 	{ "tmux-plugins/vim-tmux", ft = "tmux" },
-
+	--
 	{
 		"aserowy/tmux.nvim",
 		event = "VeryLazy",
 		opts = {},
 	},
-
-	-- notifications
+	--
+	-- -- notifications
 	{
 		"rcarriga/nvim-notify",
 		opts = {
@@ -778,6 +746,9 @@ require("lazy").setup({
 			core_mappings.notify_mappings()
 		end,
 	},
+
+	-- required for jsonls and yamlls
+	{ "b0o/schemastore.nvim", lazy = true },
 }, {
 	concurrency = 8,
 	-- Uncomment to debug an issue with a plugin by disabling all other plugins

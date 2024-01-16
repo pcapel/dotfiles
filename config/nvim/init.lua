@@ -3,7 +3,7 @@
 -- • adds the lua loader using the byte-compilation cache
 -- • adds the libs loader
 -- • removes the default Neovim loader
---vim.loader.enable()
+vim.loader.enable()
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
@@ -29,10 +29,10 @@ if vim.fn.filereadable(vim.fn.expand("~/.vimrc.local")) == 1 then
 end
 
 local modules = {
-	--	"core.globals",
+	"core.globals",
 	"core.options",
-	--	"core.commands",
-	--	"core.mappings",
+	"core.commands",
+	"core.mappings",
 	"plugins",
 }
 

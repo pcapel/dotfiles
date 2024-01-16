@@ -34,6 +34,7 @@ local all_buffers_completion_source = {
 local M = {}
 
 M.setup = function()
+  print("You set up cmp")
   -- adds support for git completions
   require('cmp_git').setup {
     trigger_actions = {
