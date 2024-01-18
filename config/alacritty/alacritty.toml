@@ -1,0 +1,12 @@
+import = [
+  "/Users/philip.capel/.config/alacritty/window.toml",
+  "/Users/philip.capel/.config/alacritty/scrolling.toml",
+  "/Users/philip.capel/.config/alacritty/fonts.toml",
+  "/Users/philip.capel/.config/alacritty/colors.toml",
+  "/Users/philip.capel/.config/alacritty/bell.toml",
+  "/Users/philip.capel/.config/alacritty/key_bindings.toml",
+  "/Users/philip.capel/.config/alacritty/mouse.toml",
+  "/Users/philip.capel/.config/alacritty/cursor.toml",
+  "/Users/philip.capel/.config/alacritty.local/alacritty.toml"
+]
+live_config_reload = true

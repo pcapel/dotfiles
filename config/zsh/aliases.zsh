@@ -55,3 +55,7 @@ function fresh-branch() {
     git checkout $2 && gpr && git checkout -b $1
   fi
 }
+
+gref() {
+  command git --no-pager diff --cached --stat | command grep " |\\s*0$" | awk '{system("command git reset " $1)}'
+}

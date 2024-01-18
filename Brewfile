@@ -9,6 +9,10 @@ cask 'marta'
 # Fast GPU rendered terminal emulator
 cask 'alacritty'
 
+# Kubernetes goodies
+brew 'kubectl'
+brew 'k9s'
+
 # for erlang
 brew 'wxwidgets'
 brew 'autoconf'

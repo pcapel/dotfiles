@@ -76,4 +76,23 @@ if [[ $OS = 'mac' ]]; then
 	brew search '/font-.*-nerd-font/' | awk '{ print $1 }' | xargs -I{} brew install --cask {} || true
 fi
 
+if ! command -v asdf &>/dev/null; then
+	echo "Installing ASDF"
+	git clone git@github.com:asdf-vm/asdf.git ~/.asdf
+	# shellcheck disable=1091
+	source "$HOME/.asdf/asdf.sh"
+	# get you some python
+	asdf plugin add python
+	asdf install python 3.11.0
+	# OXIDIZE IT
+	asdf plugin add rust
+	asdf install rust 1.75.0
+	# Because we must...
+	asdf plugin add nodejs
+	asdf install nodejs 21.5.0
+
+	asdf global python 3.11.0
+	asdf global rust 1.75.0
+
+fi
 python install.py

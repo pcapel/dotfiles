@@ -1,0 +1,4 @@
+[bell]
+animation = "EaseOutExpo"
+color = "0x000020"
+duration = 200

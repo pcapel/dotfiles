@@ -1,3 +1,4 @@
+eval "$(/opt/homebrew/bin/brew shellenv)"
 alias reload='source ~/.zshrc; echo -e "\n \u2699  \e[33mReloaded ZSH Config\e[0m \u2699"'
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -22,8 +23,13 @@ export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_CONFIG_HOME="${HOME}/.config"
 
+
+# AWS cli Configs
 export AWS_CONFIG_FILE="${XDG_CONFIG_HOME}/aws/config"
 export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME}/aws/credentials"
+
+# ASDF path
+export ASDF_DIR=~/.asdf
 
 # Setup env vars for gene synthesis scripting
 export GENE_SYNTHESIS_OUTPUT_DIR=/Users/Philip.Capel/tmp/gene_synth
@@ -62,7 +68,7 @@ setopt INC_APPEND_HISTORY
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /usr/local/bin/terraform terraform
 
-. /usr/local/opt/asdf/libexec/asdf.sh
+. $ASDF_DIR/asdf.sh
 [[ $commands[kubectl] ]] && source <(kubectl completion zsh)
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.

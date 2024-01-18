@@ -13,6 +13,10 @@ HOME = Path(HOME)
 
 
 CONFIG_DIR = Path(ENV.get("XDG_CONFIG_HOME", join(HOME, ".config")))
+try:
+    mkdir(CONFIG_DIR)
+except:
+    None
 SYMLINK_BASE = "config"
 DOTFILES = ["gitignore", "gitconfig", "gitmessage", "zshrc", "p10k.zsh"]
 CARGO_INSTALLS = ["stylua", "fastmod"]
@@ -74,6 +78,7 @@ def connect_the_dots(home: Path):
         dot = f".{file}"
         destination = home / dot
         if isfile(destination):
+            print(f"Existing file for {dot}")
             continue
         FileUtils.slink(abspath(file), destination)
         print(f"Linking: {file} -> {destination}")
