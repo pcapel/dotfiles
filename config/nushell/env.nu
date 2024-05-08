@@ -99,3 +99,64 @@ $env.NU_PLUGIN_DIRS = [
 
 # To load from a custom file you can use:
 # source ($nu.default-config-dir | path join 'custom.nu')
+
+
+# Git aliases that I'm used to
+alias gap = git add -p
+alias gb = git branch
+alias gc = git commit -v
+alias gca = git commit -a -v
+alias gcl = git clean -f -d
+alias gco = git checkout
+alias gd = git diff
+alias gdc = git diff --cached
+alias gdh = git diff HEAD
+alias gl = git pull
+alias glg = git log --graph --oneline --decorate --color --all
+alias glod = git log --oneline --decorate
+alias glp = git log -p
+# alias gnap = git add -N --ignore-removal . && gap && gref
+alias gp = git push
+alias gplease = git push --force-with-lease
+alias gpr = git pull --rebase
+alias gr = git rebase
+alias gra = git rebase --abort
+alias grc = git rebase --continue
+alias grim = git rebase -i main
+alias gst = git status
+
+# Fun stuff for mix
+alias mget = mix deps.get
+alias phs = mix phx.server
+
+# Aliasing kubectl this way has the added benefit of causing the docker prompt to display the configured context prior to opening k9s
+alias k = kubectl
+
+# ls easier
+alias l = ls -a
+alias ll = ls -alh
+
+# Common operations when not inside of a poetry shell
+alias pr = poetry run
+alias pri = poetry run ipython
+alias ppy = poetry run python
+
+# random stuff
+
+# TODO: Figure out how to make this work
+# Add a new branch fresh off of main
+# Alternatively, a fresh branch off of some other branch
+# function fresh-branch() {
+#   echo "Creating a new branch for $1"
+#   if [ -z "$2" ]; then
+#     git checkout main && gpr && git checkout -b $1
+#   else
+#     git checkout $2 && gpr && git checkout -b $1
+#   fi
+# }
+
+# TODO: Figure out how to make this work
+# gref() {
+#   command git --no-pager diff --cached --stat | command grep " |\\s*0$" | awk '{system("command git reset " $1)}'
+# }
+
