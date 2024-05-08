@@ -9,6 +9,8 @@ cask 'marta'
 # Fast GPU rendered terminal emulator
 cask 'alacritty'
 
+brew 'nushell'
+
 # Kubernetes goodies
 brew 'kubectl'
 brew 'k9s'
@@ -99,17 +101,8 @@ brew 'lazygit'
 # build tool
 brew 'make'
 
-# terminal multiplexer
-brew 'tmux'
-
-# tmux for remote pairing
-brew 'tmate'
-
 # download files from the terminal, used by some scripts
 brew 'wget'
-
-# Reattach process (e.g., tmux) to background
-brew 'reattach-to-user-namespace'
 
 # display system info
 brew 'neofetch'
@@ -139,14 +132,11 @@ brew 'zsh'
 # https://www.gnu.org/software/coreutils
 brew 'coreutils'
 
-# enable ocr via an Alfred workflow
-brew 'tesseract'
-
 # required by ccls
 brew 'llvm'
 
-# tmux session manager
-brew 'tmuxp'
+# terminal multiplexing and cool stuff
+brew 'zellij'
 
 # fonts
 tap 'homebrew/cask-fonts'

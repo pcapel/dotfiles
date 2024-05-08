@@ -29,6 +29,10 @@ alias phs='mix phx.server'
 # Aliasing kubectl this way has the added benefit of causing the docker prompt to display the configured context prior to opening k9s
 alias k="kubectl"
 
+# ls easier
+alias l="ls -a"
+alias ll="ls -alh"
+
 # Exa - https://the.exa.website/
 # alias l="exa --group --header --classify --icons --group-directories-first"
 # alias ls="exa --group --all --header --classify --icons --group-directories-first"
@@ -37,7 +41,7 @@ alias k="kubectl"
 # Common operations when not inside of a poetry shell
 alias pr="poetry run"
 alias pri="poetry run ipython"
-alias ppy="poetry  run python"
+alias ppy="poetry run python"
 
 # Tmux stuff
 alias tatt="tmux attach"

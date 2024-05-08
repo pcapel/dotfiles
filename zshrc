@@ -43,8 +43,6 @@ export ZSH_COMPDUMP=$OMZSH/cache/.zcompdump-$HOST
 (( ${+EDITOR}  )) || export EDITOR='nvim'
 export PSQL_EDITOR='vim -c"setf sql"'
 
-# Poetry setup
-export PATH="/Users/Philip.Capel/.local/bin:$PATH"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -73,4 +71,34 @@ complete -o nospace -C /usr/local/bin/terraform terraform
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-export PATH="/usr/local/sbin:$PATH"
+# bun completions
+[ -s "/Users/philip.capel/.bun/_bun" ] && source "/Users/philip.capel/.bun/_bun"
+
+# [ -s "/Users/philip.capel/projects/lex-workflows/_workflow_completions" ] && source "/Users/philip.capel/projects/lex-workflows/_workflow_completions"
+
+case ":$PATH:" in
+  *:"/usr/local/sbin":*)
+    PATH=$PATH
+    ;;
+  *) 
+    PATH="/usr/local/sbin:$PATH"
+    ;;
+esac
+
+case ":$PATH:" in
+  *:"/Users/Philip.Capel/.local/bin":*)
+    PATH=$PATH
+    ;;
+  *) 
+    PATH="/Users/Philip.Capel/.local/bin:$PATH"
+    ;;
+esac
+
+case ":$PATH:" in
+  *:"/usr/local/bin":*)
+    PATH=$PATH
+    ;;
+  *) 
+    PATH="/usr/local/bin:$PATH"
+    ;;
+esac

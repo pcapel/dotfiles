@@ -1,3 +1,7 @@
 [scrolling]
 history = 10000
 multiplier = 3
+
+[shell]
+program = "/opt/homebrew/bin/zellij"
+args = ["-l", "welcome"]

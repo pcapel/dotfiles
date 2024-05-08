@@ -2,7 +2,8 @@
 dynamic_padding = true
 dynamic_title = true
 opacity = 0.95
-startup_mode = "Windowed"
+startup_mode = "Maximized"
+option_as_alt = "Both"
 
 [window.dimensions]
 columns = 100
