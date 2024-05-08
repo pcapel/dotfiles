@@ -2,9 +2,7 @@
 #
 # version = "0.93.0"
 
-# TODO: get prompts to show information about git
 # TODO: get prompts to show information about kubernetes context
-# TODO: figure out how to setup all my aliases
 def create_left_prompt [] {
     let dir = match (do --ignore-shell-errors { $env.PWD | path relative-to $nu.home-path }) {
         null => $env.PWD
@@ -14,7 +12,9 @@ def create_left_prompt [] {
 
     let path_color = (if (is-admin) { ansi red_bold } else { ansi green_bold })
     let separator_color = (if (is-admin) { ansi light_red_bold } else { ansi light_green_bold })
-    let path_segment = $"($path_color)($dir)"
+    let branch = git rev-parse --abbrev-ref HEAD
+    let branch_color = (if ($branch == 'main') { ansi light_red_bold } else { ansi magenta })
+    let path_segment = $"($path_color)($dir) ($branch_color)($branch)"
 
     $path_segment | str replace --all (char path_sep) $"($separator_color)(char path_sep)($path_color)"
 }
