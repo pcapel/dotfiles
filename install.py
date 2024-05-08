@@ -9,10 +9,12 @@ if HOME is None:
     print("YOU HAVE NO HOME!")
     sys.exit(1)
 assert HOME is not None
+
 HOME = Path(HOME)
 
 
 CONFIG_DIR = Path(ENV.get("XDG_CONFIG_HOME", join(HOME, ".config")))
+
 try:
     mkdir(CONFIG_DIR)
 except:

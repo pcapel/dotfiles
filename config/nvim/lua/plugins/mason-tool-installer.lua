@@ -9,11 +9,7 @@ local M = {}
 
 M.setup = function()
 	installer.setup({
-
-		-- a list of all tools you want to ensure are installed upon
-		-- start; they should be the names Mason uses for each tool
 		ensure_installed = {
-			-- Null LS
 			"actionlint",
 			"codespell",
 			"eslint_d",
@@ -22,7 +18,7 @@ M.setup = function()
 			"shfmt",
 			"stylua",
 			"yamllint",
-			"black",
+			"ruff",
 			"mypy",
 
 			-- LSPs
@@ -40,9 +36,9 @@ M.setup = function()
 			"css-lsp",
 			"dockerfile-language-server",
 			"elm-language-server",
-			-- "erlang-ls",
+			"erlang-ls",
 			"eslint-lsp",
-			-- "gopls",
+			"gopls",
 			"html-lsp",
 			"json-lsp",
 			"lua-language-server",
