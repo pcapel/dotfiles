@@ -115,11 +115,12 @@ $env.SHELL = "/opt/homebrew/bin/nu"
 # Vim is Nvim
 alias vim = nvim
 
-let gref = { git --no-pager diff --cached --stat | command grep " |\\s*0$" | awk '{system("command git reset " $1)}' }
-let go_gnap = { git add -N --ignore-removal .; gap; do $gref  }
+let _gap = { git add -p }
+let _gref = { git --no-pager diff --cached --stat | command grep " |\\s*0$" | awk '{system("command git reset " $1)}' }
+let _gnap = { git add -N --ignore-removal .; do $_gap; do $_gref  }
 
 # Git aliases that I'm used to
-alias gap = git add -p
+alias gap = do $_gap
 alias gb = git branch
 alias gc = git commit -v
 alias gca = git commit -a -v
@@ -132,7 +133,7 @@ alias gl = git pull
 alias glg = git log --graph --oneline --decorate --color --all
 alias glod = git log --oneline --decorate
 alias glp = git log -p
-alias gnap = do $go_gnap
+alias gnap = do $_gnap
 alias gp = git push
 alias gplease = git push --force-with-lease
 alias gpr = git pull --rebase
@@ -141,7 +142,7 @@ alias gra = git rebase --abort
 alias grc = git rebase --continue
 alias grim = git rebase -i main
 alias gst = git status
-alias gref = do $gref
+alias gref = do $_gref
 
 # Fun stuff for mix
 alias mget = mix deps.get

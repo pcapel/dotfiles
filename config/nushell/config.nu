@@ -864,3 +864,6 @@ $env.config = {
         }
     ]
 }
+
+use mise.nu
+source ~/.oh-my-posh.nu
