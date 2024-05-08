@@ -27,8 +27,6 @@ require("lazy").setup({
 			"saadparwaiz1/cmp_luasnip",
 			-- git completions
 			"petertriho/cmp-git",
-			-- tmux pane completion
-			"andersevenrud/cmp-tmux",
 			-- icons for the completion menu
 			"onsails/lspkind.nvim",
 			"nvim-lua/plenary.nvim",
@@ -722,18 +720,7 @@ require("lazy").setup({
 		keys = core_mappings.diffview_mappings,
 	},
 
-	-- --- TMUX ---
-	--
-	-- -- tmux config file stuff
-	{ "tmux-plugins/vim-tmux", ft = "tmux" },
-	--
-	{
-		"aserowy/tmux.nvim",
-		event = "VeryLazy",
-		opts = {},
-	},
-	--
-	-- -- notifications
+	-- notifications
 	{
 		"rcarriga/nvim-notify",
 		opts = {

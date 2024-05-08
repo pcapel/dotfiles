@@ -2,6 +2,10 @@
 #
 # version = "0.93.0"
 
+# NOTE: in order to get this to work correctly, I had to set XDG_CONFIG_HOME
+# using launchctl per https://stackoverflow.com/a/3756686
+
+
 # TODO: get prompts to show information about kubernetes context
 def create_left_prompt [] {
     let dir = match (do --ignore-shell-errors { $env.PWD | path relative-to $nu.home-path }) {
@@ -12,9 +16,7 @@ def create_left_prompt [] {
 
     let path_color = (if (is-admin) { ansi red_bold } else { ansi green_bold })
     let separator_color = (if (is-admin) { ansi light_red_bold } else { ansi light_green_bold })
-    let branch = git rev-parse --abbrev-ref HEAD
-    let branch_color = (if ($branch == 'main') { ansi light_red_bold } else { ansi magenta })
-    let path_segment = $"($path_color)($dir) ($branch_color)($branch)"
+    let path_segment = $"($path_color)($dir)"
 
     $path_segment | str replace --all (char path_sep) $"($separator_color)(char path_sep)($path_color)"
 }
@@ -87,19 +89,34 @@ $env.NU_PLUGIN_DIRS = [
 ]
 
 # To add entries to PATH (on Windows you might use Path), you can use the following pattern:
-# $env.PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
+ $env.PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
 # An alternate way to add entries to $env.PATH is to use the custom command `path add`
 # which is built into the nushell stdlib:
-# use std "path add"
-# $env.PATH = ($env.PATH | split row (char esep))
-# path add /some/path
+$env.HOMEBREW_PREFIX = "opt/homebrew"
+$env.HOMEBREW_CELLAR = "opt/homebrew/Cellar"
+$env.HOMEBREW_REPOSITORY = "opt/homebrew"
+$env.PATH = ($env.PATH | split row (char esep))
+
+use std "path add"
+path add "/opt/homebrew/bin"
+path add "/opt/homebrew/sbin"
+path add "/Users/philip.capel/.local/bin"
+
 # path add ($env.CARGO_HOME | path join "bin")
 # path add ($env.HOME | path join ".local" "bin")
-# $env.PATH = ($env.PATH | uniq)
+$env.PATH = ($env.PATH | uniq)
+
+$env.EDITOR = "/opt/homebrew/bin/nvim"
+$env.SHELL = "/opt/homebrew/bin/nu"
 
 # To load from a custom file you can use:
 # source ($nu.default-config-dir | path join 'custom.nu')
 
+# Vim is Nvim
+alias vim = nvim
+
+let gref = { git --no-pager diff --cached --stat | command grep " |\\s*0$" | awk '{system("command git reset " $1)}' }
+let go_gnap = { git add -N --ignore-removal .; gap; do $gref  }
 
 # Git aliases that I'm used to
 alias gap = git add -p
@@ -115,7 +132,7 @@ alias gl = git pull
 alias glg = git log --graph --oneline --decorate --color --all
 alias glod = git log --oneline --decorate
 alias glp = git log -p
-# alias gnap = git add -N --ignore-removal . && gap && gref
+alias gnap = do $go_gnap
 alias gp = git push
 alias gplease = git push --force-with-lease
 alias gpr = git pull --rebase
@@ -124,6 +141,7 @@ alias gra = git rebase --abort
 alias grc = git rebase --continue
 alias grim = git rebase -i main
 alias gst = git status
+alias gref = do $gref
 
 # Fun stuff for mix
 alias mget = mix deps.get
@@ -157,6 +175,8 @@ alias ppy = poetry run python
 
 # TODO: Figure out how to make this work
 # gref() {
-#   command git --no-pager diff --cached --stat | command grep " |\\s*0$" | awk '{system("command git reset " $1)}'
+#   command 
 # }
 
+let mise_path = $nu.default-config-dir | path join scripts mise.nu
+~/.local/bin/mise activate nu | save $mise_path --force
