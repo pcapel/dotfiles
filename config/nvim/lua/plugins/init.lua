@@ -736,6 +736,34 @@ require("lazy").setup({
 
 	-- required for jsonls and yamlls
 	{ "b0o/schemastore.nvim", lazy = true },
+	{
+		"rcarriga/nvim-dap-ui",
+		dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
+		config = true,
+	},
+	{
+		"jay-babu/mason-nvim-dap.nvim",
+		dependencies = { "mfussenegger/nvim-dap", "williamboman/mason.nvim" },
+		opts = {
+			ensure_installed = { "python" },
+			handlers = {
+				function(config)
+					-- all sources with no handler get passed here
+
+					-- Keep original functionality
+					require("mason-nvim-dap").default_setup(config)
+				end,
+				python = function(config)
+					config.adapters = {
+						type = "executable",
+						command = "/Users/philip.capel/.local/share/nvim/mason/bin/debugpy-adapter",
+						console = "internalConsole",
+					}
+					require("mason-nvim-dap").default_setup(config) -- don't forget this!
+				end,
+			},
+		},
+	},
 }, {
 	concurrency = 8,
 	-- Uncomment to debug an issue with a plugin by disabling all other plugins

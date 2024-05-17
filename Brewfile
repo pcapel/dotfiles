@@ -125,9 +125,6 @@ brew 'shellcheck'
 # keep tree up to date
 brew 'tree'
 
-# keep zsh up to date
-brew 'zsh'
-
 # GNU File, Shell, and Text utilities
 # https://www.gnu.org/software/coreutils
 brew 'coreutils'
@@ -137,6 +134,10 @@ brew 'llvm'
 
 # terminal multiplexing and cool stuff
 brew 'zellij'
+
+# shell completions for nushell completions
+tap 'rsteube/homebrew-tap'
+brew 'rsteube/tap/carapace'
 
 # fonts
 tap 'homebrew/cask-fonts'
